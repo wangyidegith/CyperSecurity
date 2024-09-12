@@ -1,0 +1,4 @@
+![deb -i](./ubuntu3install.jpg "debian的三种安装软件的方式")
+
+dpkg -L 安装包
+查看安装包的内容

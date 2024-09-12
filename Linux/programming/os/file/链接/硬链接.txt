@@ -1,0 +1,10 @@
+#include <unistd.h>
+int link(const char *oldpath, const char *newpath);
+返回值：成0败-1
+参数：义同名
+
+
+
+#include <fcntl.h>
+int linkat(int olddirfd, const char *oldpath, int newdirfd, const char *newpath, int flags);
+flags 参数可以传递 AT_SYMLINK_FOLLOW 或 AT_SYMLINK_NOFOLLOW 选项，指定是否跟随符号链接进行操作。

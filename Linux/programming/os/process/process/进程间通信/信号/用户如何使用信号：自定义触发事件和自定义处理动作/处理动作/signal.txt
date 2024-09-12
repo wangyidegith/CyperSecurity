@@ -1,0 +1,11 @@
+#include <signal.h>
+
+       typedef void(*sighandler_t)(int);
+
+       sighandler_t signal(int signum, sighandler_t handler);
+
+返回值：signal() returns the previous value of the signal handler, or SIG_ERR on error.（摘自man手册）
+
+参数：
+signum	要捕获哪个信号
+handler	回调函数

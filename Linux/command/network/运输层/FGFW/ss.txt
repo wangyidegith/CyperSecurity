@@ -1,0 +1,244 @@
+零 服务端配置统一用root，要不容易出事！
+
+
+
+
+
+
+
+一 在vps上搭建裸ss代理
+1 apt update
+
+2 apt install shadowsocks-libev
+
+3 vim /etc/shadowsocks-libev/config.json
+{
+    "server":["0.0.0.0"],   // 改成全0
+    "mode":"tcp_and_udp",
+    "server_port":12345,
+    "local_port":1080,
+    "password":"132013wySs",   // 不要忘了
+    "timeout":86400,
+    "method":"chacha20-ietf-poly1305"   // 客户端会配置一样的
+}
+
+4 启动
+systemctl start shadowsocks-libev
+systemctl enable shadowsocks-libev
+
+5 开放代理服务器的监听端口
+ufw allow 12345
+
+
+
+
+
+
+
+二 对裸代理的思考
+（一）按照以上方法搭建的ss代理（裸ss）能用吗？
+有的能用有的不能用，
+比如vultr的vps一般就不能用（可能是被GFW重点照顾了），
+GFW通过拦截通往vultr的vps的IP包，根据流量特征发现该包的应用层流量是经过AES或chacha等对称加密方式加密的，主动向该IP发探测包，以判断该主机正在运行什么服务，至于如何判断，不得而知，这是一种重放攻击，
+被重放攻击后，vps上的ss代理服务会会显示日志：Jun 28 10:09:17 MJdeSV ss-server[66680]:  2024-06-28 10:09:17 ERROR: failed to handshake with 103.97.2.107: authentication error
+查询103.97.2.107，发现是一个香港IP，
+该IP还会变换，我查询了多次，发现都是香港的，也许GFW的主要网关就是在香港吧。
+
+
+
+（二）如何对抗重放攻击？
+既然GFW根据流量特征能够观察出这个包的一些情况，
+我们可以让GFW不观察，
+比如给原始应用层流量加一个http头，GFW一看是http流量，一般就直接放行了，这是流量伪装的方式。
+
+
+
+
+
+
+
+三 ss over websocket（http）
+（一）服务器配置步骤
+1 apt update
+
+2 apt install shadowsocks-libev
+
+3 apt install shadowsocks-v2ray-plugin
+
+4 vim /etc/shadowsocks-libev/config.json
+{
+    "server":["0.0.0.0"],
+    "mode":"tcp_and_udp",
+    "server_port":80,   // 最好改成80
+    "local_port":1080,
+    "password":"<pass>",
+    "timeout":86400,
+    "method":"chacha20-ietf-poly1305",
+    "plugin":"ss-v2ray-plugin",   // 两点：1 在Linux环境下，兹要你apt install 了，那么默认在/url/bin/下，ss也是默认去这里找这个插件，因而别乱加路径； 2 在我得环境中，apt install shadowsocks-v2ray-plugin，但名字是ss-v2ray-plugin，你最好去/usr/bin/下确认一下
+    "plugin_opts":"server"
+}
+
+4 启动
+systemctl start shadowsocks-libev
+systemctl enable shadowsocks-libev
+
+5 开放代理服务器的监听端口
+ufw allow 80
+
+
+
+（二）客户端配置步骤
+注：事实上有很多代理客户端，python的（被废弃），go的（跨平台），rust的（跨平台），swift的（MacOS端），kotlin的（安卓端），C的（Linux），C#的（Windows），你可以在https://github.com/shadowsocks上进行选择和下载。
+
+
+Windows：
+1 在https://github.com/shadowsocks/shadowsocks-windows/releases/下载ss的代理客户端（V2rayN不能用流量伪装插件，因而不用V2rayN，这里科普一下V2ray，vmess、vless是服务器，V2ray是客户端，V2rayN是V2ray的图形化客户端）。
+
+2 在https://github.com/shadowsocks/v2ray-plugin/releases/下载流量伪装插件。
+
+3 将流量伪装插件v2ray-plugin_windows_amd64.exe放到ss代理客户端目录下，这一步很关键。
+
+4 配置ss代理客户端。
+
+5 配置浏览器代理，谷歌使用SwitchyOmega。
+
+
+Linux：
+1 apt update
+
+2 apt install shadowsocks-libev
+
+3 apt install shadowsocks-v2ray-plugin
+
+4 sudo vim /etc/shadowsocks-libev/config.json
+{
+    "server":"<ss-server ip or domain>",   // 代理服务器
+    "mode":"tcp_and_udp",
+    "server_port":80,   // 服务器端口号
+    "local_port":1080,   // 代理服务在本地的映射端口
+    "password":"<pass>",   // ss-server的密码
+    "timeout":86400,
+    "method":"chacha20-ietf-poly1305",
+    "plugin":"ss-v2ray-plugin"
+}
+
+5 nohup ss-local -c /etc/shadowsocks-libev/config.json &
+建议开机自启：
+（1）crontab -e
+（2）@reboot /usr/bin/nohup /usr/bin/ss-local -c /etc/shadowsocks-libev/config.json > /home/<user>/.sslocal.out 2>&1 &
+
+6 配置proxychains4（最好使用dynamic）：
+（1）sudo vim /etc/proxychains4.conf
+（2）添加：socks5 127.0.0.1 1080
+注：假设客户端的IP地址是192.168.43.23，如果你添加一条socks5 192.168.43.23 1080，那么别人将可以通过该客户端使用ss-server。 
+
+
+
+
+
+
+
+四 ss over websocket（https）
+（零）ACME证书
+1 为什么需要ACME？在计算机网络的“X509协议”部分，我们说明了如何使用openssl注册CA证书的四个步骤（生成公私钥对，生成CSR，提交注册信息和CSR，安装），这个过程往往需要openssl的专业知识和一个选定的证书，且一般的证书公司不提供免费的证书。
+
+2 ACME (Automated Certificate Management Environment) 是由IETF提供的一种简化和自动化X509协议的协议，主要有两点优势：
+（1）提供一个脚本acme.sh简化了CA注册的操作。
+（2）IETF基于该协议提供免费证书服务。
+
+3 如何使用ACME协议安装免费证书？（一定要使用root权限，sudo都不行）
+（1）前提
+a 安装socat。
+b 安装一台web服务器，并且关闭它，并且记得开放80端口。
+注：这是要用于申请阶段的审核：我们知道CA一般使用挑战-响应协议对域名进行审核，具体在这里我们使用standalone方式，CA会让域名所属服务器将一个字符串放到web页面上，然后查看该行为，如果服务器确实做到了这一点，那么说明该域名确实属于该服务器，CA将会信任该服务器实体。
+（2）安装acme脚本（acme.sh）
+curl https://get.acme.sh | sh
+注：安装完成后，当前目录会出现一个.acme.sh目录，里面包含了scme.sh脚本，最好将acme.sh放入PATH以随地使用：ln -s acme.sh的完整路径 /usr/local/bin/acme.sh
+（3）注册账户
+acme.sh --register-account -m <mail>
+（4）申请证书
+acme.sh --issue -d <domain> --standalone
+（5）安装证书
+acme.sh --installcert -d <domain> --key-file <私钥的绝对路径> --fullchain-file <证书链的绝对路径>
+注：acme会为你在.acme.sh目录下生成一个以domain命名的目录，里面存放着你的私钥、证书、中间证书、证书链等信息。
+（6）设置自动续期
+acme.sh --cron --home <.acme.sh绝对路径> --force
+
+
+
+（一）服务器配置步骤
+1 apt update
+
+2 apt install shadowsocks-libev
+
+3 apt install shadowsocks-v2ray-plugin
+
+4 vim /etc/shadowsocks-libev/config.json
+{
+    "server":["0.0.0.0"],
+    "mode":"tcp_and_udp",
+    "server_port":443,   // 最好改成443，显得自己是https
+    "local_port":1080,
+    "password":"<pass>",
+    "timeout":86400,
+    "method":"chacha20-ietf-poly1305",
+    "plugin":"ss-v2ray-plugin",
+    "plugin_opts":"server;tls;host=<server-domian>;cert=<fullchain.cer的完整路径>;key=<server-domain.key的完整路径>"
+}
+
+4 启动
+systemctl start shadowsocks-libev
+systemctl enable shadowsocks-libev
+注：重启后如果遇到无权证书相关文件导致启动失败的情况，请去/lib/systemd/system/下寻找shadowsocks.service文件并添加USER=root。（所以无脑root就好了，不要用sudo）
+
+5 开放代理服务器的监听端口
+ufw allow 443
+
+
+
+（二）客户端配置步骤
+注：事实上有很多代理客户端，python的（被废弃），go的（跨平台），rust的（跨平台），swift的（MacOS端），kotlin的（安卓端），C的（Linux），C#的（Windows），你可以在https://github.com/shadowsocks上进行选择和下载。
+
+
+Windows：
+1 在https://github.com/shadowsocks/shadowsocks-windows/releases/下载ss的代理客户端（V2rayN不能用流量伪装插件，因而不用V2rayN，这里科普一下V2ray，vmess、vless是服务器，V2ray是客户端，V2rayN是V2ray的图形化客户端）。
+
+2 在https://github.com/shadowsocks/v2ray-plugin/releases/下载流量伪装插件。
+
+3 将流量伪装插件v2ray-plugin_windows_amd64.exe放到ss代理客户端目录下，这一步很关键。
+
+4 配置ss代理客户端。
+
+5 配置浏览器代理，谷歌使用SwitchyOmega。
+
+
+Linux：
+1 apt update
+
+2 apt install shadowsocks-libev
+
+3 apt install shadowsocks-v2ray-plugin
+
+4 sudo vim /etc/shadowsocks-libev/config.json
+sudo vim /etc/shadowsocks-libev/config.json
+{
+    "server":"<ss-server ip or domain>",   // 代理服务器
+    "mode":"tcp_and_udp",
+    "server_port":443,   // 服务器端口号
+    "local_port":1080,   // 代理服务在本地的映射端口
+    "password":"<pass>",   // ss-server的密码
+    "timeout":86400,
+    "method":"chacha20-ietf-poly1305",
+    "plugin":"ss-v2ray-plugin"
+    "plugin_opts":"tls;host=<server-domain>"
+}
+
+5 nohup ss-local -c /etc/shadowsocks-libev/config.json &
+建议开机自启：
+（1）crontab -e
+（2）@reboot /usr/bin/nohup /usr/bin/ss-local -c /etc/shadowsocks-libev/config.json > /home/<user>/.sslocal.out 2>&1 &
+
+6 配置proxychains4（最好使用dynamic）：
+（1）sudo vim /etc/proxychains4.conf
+（2）添加：socks5 127.0.0.1 1080
+注：假设客户端的IP地址是192.168.43.23，如果你添加一条socks5 192.168.43.23 1080，那么别人将可以通过该客户端使用ss-server。 

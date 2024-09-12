@@ -1,0 +1,15 @@
+journalctl
+
+journalctl -u nginx
+查看nginx的日志
+
+journalctl -u nginx -f
+实时查看 nginx 服务的日志
+
+journalctl -u nginx --since "2023-06-01" --until "2023-06-30"
+查看时间范围内的日志，也能这样：
+journalctl -u nginx --since "10 minutes ago"
+journalctl -u nginx --since "2 hours ago"
+
+journalctl -u nginx -n 10
+查看最近十行的日志

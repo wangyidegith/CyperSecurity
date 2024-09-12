@@ -1,0 +1,38 @@
+目录相关：
+opendir()
+readdir()
+closedir()
+chdir()
+getcwd()：获取当前目录路径
+mkdir()
+rmdir()
+
+重命名文件：（命令是mv）
+rename()
+	int rename(const char *oldpath, const char *newpath);   // 该函数相当于mv，但是要注意该函数不能操作软链接
+
+判断文件权限：
+access()
+	int access(const char *path, int mode);
+		mode是要检查的权限，可以是如下的位或：
+			R_OK：检查读权限
+			W_OK：检查写权限
+			X_OK：检查执行权限
+			F_OK：检查文件是否存在
+		返回值为0表示有此权限，返回-1表示没有此权限或者出错
+
+修改文件权限：
+chmod()
+	int chmod(const char *path, mode_t mode);
+		mode是新的访问权限
+
+修改文件所属：
+chown()
+	int chown(const char *path, uid_t owner, gid_t group);
+		owner和group是新的拥有者和拥有组
+
+设置文件大小：
+truncate()
+	int truncate(const char *path, off_t length);
+ftruncate()
+	int ftruncate(int fd, off_t length);

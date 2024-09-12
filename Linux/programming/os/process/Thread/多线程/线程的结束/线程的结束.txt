@@ -1,0 +1,7 @@
+线程		进程
+return		return
+pthread_exit	exit
+pthread_join	wait、waitpid（进程不能detach）
+pthread_cancel	kill
+
+

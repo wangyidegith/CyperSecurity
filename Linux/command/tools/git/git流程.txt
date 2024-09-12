@@ -1,0 +1,12 @@
+1 初始化一个新的Git仓库：
+git init
+
+2 添加远程GitHub仓库：
+git remote add <仓库的本地名，一般叫origin> <你的GitHub仓库URL>
+
+3 添加文件并提交更改：
+git add .
+git commit -m "评论"
+
+4 推送到GitHub：
+git push -u <仓库的本地名，一般叫origin> master

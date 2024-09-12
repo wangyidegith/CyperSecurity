@@ -1,0 +1,9 @@
+#include <unistd.h>
+int symlink(const char *target, const char *linkpath);
+返回值：成0败-1
+参数：target指原文件名，linkpath指目标文件名
+
+
+
+#include <unistd.h>
+int symlinkat(const char *target, int newdirfd, const char *linkpath);

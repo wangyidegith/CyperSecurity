@@ -1,0 +1,11 @@
+sudo adduser 用户名
+	1 全部自动创建
+	2 此时再去/etc/sudoers里添加该用户，该用户即可使用sudo
+sudo useradd -s /bin/bash -g 用户组 -d(-m) [家目录]
+	-m是自动创建家目录
+	-d是手动指定家目录
+
+如何创建一个系统用户？
+sudo useradd -r -s /sbin/nologin systemuser
+-r表示没有家目录
+-s sbin/nologin表示不允许该用户登录

@@ -1,0 +1,23 @@
+Ctrl：
+向左：Ctrl + b
+向右：Ctrl + f
+移动到头部：Ctrl + a
+移动到尾部：Ctrl + e
+删除光标前的所有字符：Ctrl + u
+删除光标后的所有字符：Ctrl + k
+删除光标前的本单词的字符：Ctrl + w
+删除光标后的本单词的字符：Ctrl + d
+撤销：Ctrl + y
+杀死进程：Ctrl + c
+将进程转到后台运行：Ctrl + z，键入fg返回
+退出当前shell：Ctrl + d，相当于exit命令
+backspace：Ctrl + h
+删除当前字母：Ctrl + d
+搜索之前执行过的命令：Ctrl + r
+
+Esc：
+往右跳一个单词：Esc + f
+往左跳一个单词：Esc + b
+
+
+

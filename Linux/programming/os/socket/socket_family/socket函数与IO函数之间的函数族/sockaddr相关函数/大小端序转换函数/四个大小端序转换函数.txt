@@ -1,0 +1,11 @@
+#include <arpa/inet.h>
+IP地址：
+	主机转网络：
+		uint32_t       htonl(uint32_t       主机IP地址);
+	网络转主机：
+		uint32_t       ntohl(uint32_t       网络IP地址);
+端口号：
+	主机转网络：
+		uint16_t       htons(uint16_t       主机端口号);
+	网络转主机：
+		uint16_t       ntohs(uint16_t       网络端口号);

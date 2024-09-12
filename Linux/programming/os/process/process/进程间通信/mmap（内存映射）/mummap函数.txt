@@ -1,0 +1,7 @@
+#include <sys/mman.h>
+int munmap(void *addr, size_t length);   // 该函数的功能是解除映射关系，并不是删除被映射的存储
+返回值：成0败-1
+参数：
+	addr：对应mmap的addr
+	length：设置为0表示删除该进程在addr处的所有映射区域，这意味着我们可以使用了length控制只删除一部分
+		注意：mmap的length不能是0，必须设置为大于0的整数

@@ -1,0 +1,42 @@
+一 功能：通过HTTP，HTTPS，FTP从某台服务器（URL）上下载文件。事实上wget也可以通过一些特殊选项实现上传，但是一般不用，正如它的名字一样web get，它主要用于从web上下载。
+二 基本命令：
+wget <url>
+注：url得加引号。
+三 主要选项
+1 [-P <directory>] -O <filename>
+-P同--directory-prefix，-i同--input-file；
+将下载的文件保存位指定的文件名，-P指定目录；
+2 -c
+断点续传
+3 -r [-l <depth>] [-np]
+递归下载，depth指定递归的最大深度，-np表示不跟踪父目录；
+4 -l <rate>
+-l同--limit-rate；
+限速下载，单位为kb；
+5 --user-agent=<agent>
+同：-U <agent>
+伪装USER-AGENT头，模拟其他浏览器；
+6 -u <username> -p <password>
+同：--http-user=<username> --http-password=<password>
+认证下载；
+（重要）7 -b
+后台下载
+8 -i <file>
+从文件中读取要下载的URL列表；
+9 -L [-E]
+跟随重定向，-E表示保留重定向后的文件扩展名；
+10 常见功能性选项（这些对一般命令都适用）：
+-q: 同--quiet，安静模式,不输出任何信息。
+-v: 同--verbose，详细模式,输出详细的下载过程。
+-d: 同--debug，调试模式,输出更多的调试信息。
+-t <number>: 同--times，最大尝试次数,默认20次。
+-T <seconds>: 同--time，超时时间,默认60秒。
+11 -o <logfile>
+指定日志文件，注意和-O的区别；
+12 --no-check-certificate
+不验证证书；
+13 -N
+同--timestamping；
+只下载新的文件；
+（重要）14 本来不能走代理，通过-e进行扩展，但是我们直接用proxychains了！
+通过代理下载；

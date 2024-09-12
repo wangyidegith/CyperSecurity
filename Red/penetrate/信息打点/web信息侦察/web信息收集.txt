@@ -1,0 +1,127 @@
+该文讲web信息收集的思路，就是以域名为原点，资产->指纹。
+这里讲到了一些工具这些工具很重要，但是其实我们更多时候主要会用一些综合性的渗透测试工具来做信息打点，关于这一点详见《综合性渗透测试工具》。
+
+
+
+
+
+
+
+起点：域名。
+
+
+
+
+
+
+
+第一步：搜集子域名（资产搜集）
+（一）网站（全但不准，ARL是主力，fofa和hunter可以进一步过滤）：
+1 站长之家：https://tool.chinaz.com/subdomain/
+
+注：语法也就是或与非、小括号、kv形式，至于有哪些key，用到再查，比如domain、after、body、title、header等。
+2 fofa：
+
+3 hunter：
+
+4 ARL
+（1）下载和安装：
+a 下载地址：https://github.com/Aabyss-Team/ARL。
+b 一键安装命令：
+wget https://raw.githubusercontent.com/Aabyss-Team/ARL/master/misc/setup-arl.sh
+chmod +x setup-arl.sh
+./setup-arl.sh
+c 访问：https://IP:5003/
+
+
+
+（二）工具（layer和subfinder常用，尤其是subfinder，JSFinder是针对性强的）：
+1 JSFinder：爬取JS文件中的域名（准但不全）：https://github.com/Threezh1/JSFinder
+（0）这种方法可以让你的搜集更明确，比如你就想搜集和某个页面有关的URL，你就可以用这种方式。
+（1）简单爬取：python JSFinder.py -u http://www.mi.com
+（2）深度爬取：python JSFinder.py -u http://www.mi.com -d
+（3）指定文件以保存URL：python JSFinder.py -u http://www.mi.com -ou mi_url.txt
+（4）指定文件以保存子域名：python JSFinder.py -u http://www.mi.com -os mi_subdomain.txt
+（5）指定cookie：python JSFinder.py -u http://www.mi.com -c "session=xxx"
+（6）常见用法：python JSFinder.py -u http://www.mi.com -d -ou mi_url.txt -os mi_subdomain.txt
+
+2 layer子域名挖掘机：https://www.webshell.cc/6384.html。5.0新版：https://pan.baidu.com/s/lwEP_Ysg4qsFbm_k1aoncpg，uk1j。
+
+3 subfinder：https://github.com/projectdiscovery/subfinder
+
+4 OneForAll：https://github.com/shmilylty/OneForAll
+暂时不用
+
+
+
+（三）其他方法（不常用）
+1 根据ICP备案号查子域名：https://beian.miit.gov.cn/#/Integrated/recordQuery
+
+2 根据SSL证书查子域名：https://myssl.com/
+
+
+
+
+
+
+
+第二步：进一步搜集指纹（网站）
+（零）关于站点的指纹信息：用的什么web服务器、什么语言、什么框架等等。
+
+
+
+（一）网站：
+1 http://finger.tidesec.com/：经测试扫描效果也不是很好，但是能查出来GPS信息。
+
+
+
+（二）浏览器插件（最舒服的方法）：
+1 Wappalyzer：这是一个浏览器插件，可以在https://www.wappalyzer.com/添加，但是要钱（每个月有50次免费）。
+
+
+
+（三）工具：
+1 Ehole
+
+2 httpx
+
+3 IISPutScanner：不光能用来搜C段，也可以用来探测web服务器类型和版本，更可以用来探测上传漏洞。
+
+
+
+（四）注册和备案信息（其实也没啥必要）
+1 站长之家（能查很多东西）：https://whois.chinaz.com/
+
+2 注册信息：whois命令
+
+3 备案信息：https://beian.miit.gov.cn/
+
+
+
+
+
+
+
+其他突破口：
+（零）小程序：爱企查、天眼查、七麦
+
+（一）旁站（同服站点）
+https://c.webscan.cc/
+
+（二）C段搜集
+1 https://c.webscan.cc/
+2 IISPutScanner：该工具不光可以扫段还可以探测服务版本和PUT漏洞。
+
+
+
+
+
+
+
+总的来看有三大样：
+工具（最差）：目前三个工具没有弄：httpx、ehole、subfinder，目前弄起来的工具有IISPutScanner、layer。
+网站（其次）：详见hack.html
+浏览器插件（最好）：尤其是指纹信息搜集插件。
+
+exp工具：
+web：bp sqlmap dirmap wfuzz xray awvs，除了bp都没弄。

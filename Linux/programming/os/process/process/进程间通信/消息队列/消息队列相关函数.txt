@@ -1,0 +1,55 @@
+#include <mqueue.h>
+// 创建一个消息队列
+mqd_t mq_open(const char* name, int oflag, mode_t mode, struct mq_attr* attr);
+返回值：mqd_t相当于int，成功返回消息队列文件描述符，失败返回-1
+参数：
+	name：消息队列名
+	oflag：
+		O_RDWR
+		O_RDONLY
+		O_WRONLY
+		O_NONBLOCK
+		O_CREAT
+		O_EXCL
+	mode：（只有在O_CREAT时，下面的才有意义）
+		S_IRUSR
+		S_IWUSR
+		S_IRGRP
+		S_IWGRP
+		S_IROTH
+		S_IWOTH
+	attr：
+		struct mq_attr 
+		{
+    			long mq_flags;     // 消息队列的属性标志，可以为0或O_NONBLOCK
+    			long mq_maxmsg;    // 消息队列中的最大消息数，如果为0表示无限制
+    			long mq_msgsize;   // 消息队列中每个消息的最大字节数
+    			long mq_curmsgs;   // 消息队列中当前的消息数
+		};
+
+// 删除一个消息队列
+int mq_unlink(const char* name);
+
+// 发送消息
+int mq_send(mqd_t mqdes, const char* msg_ptr, size_t msg_len, unsigned int msg_prio);
+返回值：和write一样，在非阻塞时如果队列已满，返回-1，并设置错误码为EAGAIN
+参数：
+	mqdes：mq_open的返回值
+	msg_ptr：消息
+	msg_len：消息长度，该长度不能大于mq_msgsize
+	msg_prio：消息优先级，默认为0，0表示普通优先级即先进先出
+
+// 接收消息
+ssize_t mq_receive(mqd_t mqdes, char* msg_ptr, size_t msg_len, unsigned int* msg_prio);
+返回值：和read一样，在非阻塞时如果队列为空，返回-1，并设置错误码为EAGAIN
+参数：和mq_send一致
+
+// 控制消息队列
+int mq_setattr(mqd_t mqdes, const struct mq_attr* newattr, struct mq_attr* oldattr);
+int mq_getattr(mqd_t mqdes, struct mq_attr* attr);
+返回值：成0败-1
+参数：oldattr作为一个传入参数是通过mq_getattr获得的，其中，attr是传出参数，newattr也是传入参数
+
+
+
+

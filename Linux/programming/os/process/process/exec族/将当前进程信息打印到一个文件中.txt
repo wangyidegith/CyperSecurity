@@ -1,0 +1,17 @@
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+int main()
+{
+        int fd = open("ps_ax.out", O_RDWR | O_CREAT, 0770);
+        if (fd == -1) {
+                perror("open failed");
+                exit(1);
+        }
+        dup2(fd, STDOUT_FILENO);   // 这是dup2的常见用法：标准输出STDOUT_FILENO默认指向的是屏幕
+        execlp("ps", "ps", "ax", NULL);   // 一旦该函数调用成功，那么函数将不再返回，也就是说你后面不管写什么都不会执行了
+        perror("execlp failed");
+        return 0;
+}

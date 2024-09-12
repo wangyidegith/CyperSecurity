@@ -1,0 +1,12 @@
+service --status-all
+	列举出所有的服务及状态信息
+sudo service 服务名 start
+sudo service 服务名 stop
+sudo service 服务名 restart
+sudo service 服务名 status
+
+使用systemctl也可以。
+
+重要：
+systemctl enable 服务名
+	用于在 systemd 管理的 Linux 系统中启用（enable）一个系统服务或者其他单元（unit），使得系统在启动时【自动】加载并启动这些服务或单元。

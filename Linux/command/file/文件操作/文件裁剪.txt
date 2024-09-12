@@ -1,0 +1,6 @@
+cut 选项 文件
+选项如下：
+-c, --characters=LIST：根据字符位置进行剪切
+-f, --fields=LIST：根据字段（列）位置进行剪切
+-d, --delimiter=DELIM：指定字段（列）的分隔符，默认为制表符
+--complement：显示未被选中的部分

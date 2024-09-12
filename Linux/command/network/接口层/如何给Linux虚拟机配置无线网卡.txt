@@ -1,0 +1,17 @@
+一 背景
+virtualbox并没有提供以无线网的联网方法，所以只能自己虚拟化一张出来。
+
+二 方法
+1 wget https://mirror2.openwrt.org/sources/compat-wireless-2010-06-28.tar.bz2
+2 tar -xjvf compat-wireless-2010-06-28.tar.bz2
+3 sudo make unload
+4 sudo make load
+启动无线网卡
+5 iwconfig
+看到出现了无线网卡
+6 sudo ip addr add <ip addr> dev <wlan interface>
+配置无线网卡的IP地址
+7 iwconfig <wlan interface> mode monitor
+将无线网卡的工作模式改为monitor，这样它就可以工作了，注意这一步得先down掉这个网卡
+8 sudo ip link set <wlan interface> up
+启动该无线网卡

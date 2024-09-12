@@ -1,0 +1,34 @@
+一 ELF (Executable and Linkable Format)文件：
+注：
+（1）这种文件是二进制格式，但凡说起来程序，不管什么，肯定最终都是二进制，你也可以这么认为，可执行文件就是二进制的；
+（2）ELF就是当前Linux使用最广泛的二进制文件格式。Windows时PE（Portable Executable）。
+（3）跨平台的本质：二进制文件是分系统的，ELF当然不能在Windows下运行，PE当然也不能在Linux下运行，所以，高级语言Java、python、go等等它们所谓的虚拟机或者叫解释器其实就是用来隐藏系统差异的。
+1 这是 Linux 系统中最常见的可执行文件格式。
+2 ELF 文件包含了程序代码、数据、库依赖等信息，可被 Linux 内核直接执行。
+3 通常以无扩展名或以.exe（一般在Linux下不适用这个因为这个后缀名已被Windows的二进制可执行文件广泛使用，为了区分尽量不要在Linux使用exe）、.bin、.elf、.so结尾的文件就是 ELF 格式的可执行文件。
+4 如何执行二进制可执行文件？路径法。不管是绝对路径还是相对路径，都必须有路径，因为没有路径，shell会根据PATH下定义的路径去找程序。
+
+
+
+二 shell脚本：
+1 在文件里#!/bin/bash创建出来的文件就是shell脚本文件（ Bourne-Again shell script, Unicode text, UTF-8 text executable）。
+2 为了表明这是shell脚本，往往这些以.sh作为后缀名；
+3 如何执行shell脚本？
+（1）source：用的多。
+（2）bash
+上面这两种方法不用x权限。
+（3）路径法（绝对路径或者相对路径皆可）：
+a 必须有x权限。
+b 不光是shell文件，也可以执行二进制格式的文件比如elf，source只能执行shell脚本，bash只能执行bash脚本。
+
+
+
+三 各类其他语言生成的可执行文件：
+1 Python脚本：这些以 .py 结尾的文件包含了 Python 代码，可通过 Python 解释器执行，比如python test.py。
+2 Java class文件：这些以 .class 结尾的文件包含了 Java 字节码，可通过 Java 虚拟机执行，比如javac test.java生成test.class，再java test.class。
+3 可执行档案文件 (可执行JAR包)：这些以 .jar 结尾的文件包含了 Java 类和资源，可通过 Java 虚拟机执行，java -jar test.jar。
+4 更多其他的语言，rust、go、perl等。
+
+
+
+综上：只有elf和shell算Linux可执行文件即想要通过路径法执行那文件权限里得带x，高级语言的文件不用带x。

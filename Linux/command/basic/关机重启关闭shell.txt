@@ -1,0 +1,13 @@
+关机：
+poweroff
+shutdown [参数] 
+	-r now    立即重启
+	-h now    立即关机
+	-k 'string'    发出讯息，并不真的关机
+	-t时间    多长时间后做什么事情
+
+重启：
+reboot
+
+关闭shell：
+exit

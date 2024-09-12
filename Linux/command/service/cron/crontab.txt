@@ -1,0 +1,11 @@
+使用以下命令编辑当前用户的crontab文件：
+crontab -e
+
+如果要编辑其他用户的crontab文件（例如root用户），可以使用：
+sudo crontab -u username -e
+
+使用以下命令查看当前用户的crontab内容：
+crontab -l
+
+若要删除当前用户的所有定时任务，可以使用：
+crontab -r

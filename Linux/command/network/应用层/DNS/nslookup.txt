@@ -1,0 +1,20 @@
+nslookup [option] <ip addr or domain name>
+1 nslookup www.baidu.com
+查找百度域名的IP地址
+2 nslookup 1.2.3.4
+查找该IP地址所对应的域名
+3 nslookup www.baidu.com 8.8.8.8
+指定使用8.8.8.8查询百度的域名
+4 nslookup -type
+5 交互模式：
+（1）设置映射类型
+set type=A
+set type=cname
+......
+（2）设置DNS服务器
+server 8.8.8.8
+（3）查找域名信息
+www.baidu.com
+（4）enter键查询
+（4）退出
+exit

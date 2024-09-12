@@ -1,0 +1,15 @@
+struct   hostent*       gethostbyname(const   char*   name);   
+/* 该函数不可重入，
+也就是说，如果你连续调用3次该函数，那么，所有调用的返回值都是最后一次调用返回的结果，
+所以，使用该函数时要格外小心，如果单线程内多次使用该函数，要切记及时读取返回值，如果多线程使用该函数，要注意线程同步。
+*/
+参数：name是域名，比如"www.baidu.com"；
+返回值：
+	struct   hostent {
+		char*   h_name;   // 主机的正式名称
+		char**   h_aliases;   // 别名列表
+		int   h_addrtype;   // 主机的地址类型 == socket函数的第一个参数
+		int   h_length;    // 地址长度 == 4
+		char**   h_addr_list;   // 地址列表：一台计算机的IP地址可以有很多，如果我们已经知道了一个IP地址，我们可以使用：struct   hostent*       gethostbyaddr(const   void*   addr/*已知的IP地址*/,       int   len,/*第一个参数的长度*/       int   type/*socket的第一个参数*/);
+}
+#define   h_addr   h_addr_list[0]   // 如果程序员需要使用一个IP地址，那么可以任选一个，但是一般使用h_addr，即第一个

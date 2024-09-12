@@ -1,0 +1,27 @@
+pthread_cancel
+应用场景：一个线程如何杀死另一个线程？（无关分离与否）
+杀死线程的方法：
+	1 设置标志位（常用）
+	2 线程间通信（不常用）
+	3 pthread_cancel（标准方法）
+函数原型：
+	int pthread_cancel(pthread_t thread);
+返回值：
+	成0败非0错误号
+参数：
+	线程id
+理解：
+	线程A要杀死线程B，A调用pthread_cancel，发送一个取消请求，既然是请求，线程B有可能死也有可能不死，如果死，也有可能立即死也有可能过一会死。
+	决定线程B是否死的是线程B的state，有两种：PTHREAD_CANCEL_ENABLE和PTHREAD_CANCEL_DISABLE，默认值是PTHREAD_CANCEL_ENABLE，可以使用int pthread_setcancelstate(int state, int *oldstate);设置为PTHREAD_CANCEL_DISABLE。
+	决定线程B啥时候死的是线程B的type，有两种：PTHREAD_CANCEL_DEFERRED和PTHREAD_CANCEL_ASYNCHRONOUS，默认值是PTHREAD_CANCEL_DEFERRED，可以使用int pthread_setcanceltype(int type, int *oldtype);来设置PTHREAD_CANCEL_ASYNCHRONOUS。
+	延迟取消的规则：取消点。
+cleanup机制：
+	两个函数：
+		void pthread_cleanup_push(void (*routine)(void *), void *arg);
+		参数：
+			void (*routine)(void *) ： cleanup函数
+			arg ： cleanup函数的参数
+		void pthread_cleanup_pop(int execute);
+		参数：0 弹出cleanup函数但是不执行 1 弹出cleanup函数且执行
+	范围：两个函数标识了一个范围
+	运行原理：堆栈

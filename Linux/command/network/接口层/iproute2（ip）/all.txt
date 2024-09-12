@@ -1,0 +1,4 @@
+ip addr（原来的ip命令）
+ip link（原来的ifconfig命令）
+ip route（原来的route命令）
+ip neigh（原来的arp命令）

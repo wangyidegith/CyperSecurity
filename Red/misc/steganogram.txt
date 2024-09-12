@@ -1,0 +1,71 @@
+信息隐藏技术指将信息隐藏在某些形式的媒体中的技术。
+
+
+
+
+
+
+
+Linux：
+1 安装：
+sudo apt install steghide
+2 选项介绍：
+（1）大选项
+隐藏文件: steghide embed -ef embed_file.txt -cf cover.jpg -p <passwd>
+提取文件: steghide extract -sf cover.jpg -p <passwd>
+（2）小选项
+-ef、-cf 和 -sf 是 steghide 命令中的3个常用参数,它们的全称分别是:
+-ef (Embed File)
+表示要嵌入(隐藏)的文件名。
+-cf (Cover File)
+表示要将文件隐藏到的封面文件(通常是图片文件)。
+-sf (Source File)
+表示要从中提取隐藏文件的源文件(封面文件)。
+注：使用时要注意：
+1 bmp, jpeg, wav, au 只支持这四种图片文件格式
+2 steghide使用的是LSB算法，因而对图片大小有要求，图片不能太小，embed文件也不能太大。
+如何暴力破解steghide的密码？
+#!/bin/bash
+echo "Starting brute force attack on $1 with passwords from $2..."
+count=0
+total_lines=$(wc -l < $2)
+echo "Total passwords to try: $total_lines"
+for line in $(cat $2); do
+    ((count++))
+    echo -e "\nTrying password $count/$total_lines: $line..."
+
+    steghide extract -sf $1 -p $line
+    steghide_exit_status=$?
+
+    if [[ $steghide_exit_status -eq 0 ]]; then
+        echo -e "\nPassword found: $line"
+        exit 0
+    elif [[ $steghide_exit_status -eq 1 ]]; then
+        echo "Incorrect password: $line"
+    else
+        echo "Error occurred while trying password: $line"
+    fi
+done
+echo -e "\nPassword not found in the list."
+exit 1
+
+
+
+
+
+
+
+Windows：
+方法一：
+隐藏文件: copy /b image.jpg + secret_file.压缩 新文件.jpg
+提取文件: 将“新文件.jpg”的后缀修改为.压缩就可以了
+方法二：
+隐藏文件: rename 源文件名 "源文件名../"
+注："源文件名../"一定要加引号！！！
+提取文件: rename "dir /x显示出的小文件名" 还原出的的文件名
+注：
+1 准确的说这不是一种隐写术，这是一种让别人打不开也删不掉自己文件的方法，继而实现了隐藏真实信息。
+2 Windows不允许任何文件名以 . 结尾，但是我们可以强制做到这一点，Windows会使得此类文件打不开也删不掉。
+3 与此同时rename也为我们提供了一种删除文件的思路，如果一个文件怎么也删不掉，那么就用rename给它改名，然后再删。
+4 注意：这种方法只针对于目录而不针对于文件，文件一旦隐藏无法使用这个方法的提取方法复原，可以将其传到Linux再mv改回来，但是怎么删呢？使用WinRAR！
+

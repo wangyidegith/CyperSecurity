@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>pthread_create的第二个参数attr</title>
+</head>
+
+<body>
+
+<table border="1" cellpadding="5" cellspacing="0"> <tr> <th>成员</th> <th>可取值</th> <th>默认值</th> <th>相关操作函数</th> </tr> <tr> <td><code>stacksize</code></td> <td>任意正整数</td> <td>系统相关，通常为 <code>PTHREAD_STACK_MIN</code></td> <td><code>pthread_attr_getstacksize()</code> 和 <code>pthread_attr_setstacksize()</code></td> </tr> <tr> <td><code>detachstate</code></td> <td> <ul> <li><code>PTHREAD_CREATE_JOINABLE</code>（非分离状态）</li> <li><code>PTHREAD_CREATE_DETACHED</code>（分离状态）</li> </ul> </td> <td><code>PTHREAD_CREATE_JOINABLE</code></td> <td><code>pthread_attr_getdetachstate()</code> 和 <code>pthread_attr_setdetachstate()</code></td> </tr> <tr> <td><code>stackaddr</code></td> <td>任何指针值</td> <td><code>NULL</code></td> <td><code>pthread_attr_getstackaddr()</code> 和 <code>pthread_attr_setstackaddr()</code></td> </tr> <tr> <td><code>stackguard</code></td> <td>任意正整数</td> <td>系统相关</td> <td><code>pthread_attr_getguardsize()</code> 和 <code>pthread_attr_setguardsize()</code></td> </tr> <tr> <td><code>schedparam</code></td> <td><code>sched_param</code> 结构体</td> <td>系统相关</td> <td><code>pthread_attr_getschedparam()</code> 和 <code>pthread_attr_setschedparam()</code></td> </tr> <tr> <td><code>schedpolicy</code></td> <td>任意一个调度策略，如 <code>SCHED_FIFO</code>、<code>SCHED_RR</code>、<code>SCHED_OTHER</code> 等</td> <td><code>SCHED_OTHER</code></td> <td><code>pthread_attr_getschedpolicy()</code> 和 <code>pthread_attr_setschedpolicy()</code></td> </tr> <tr> <td><code>inheritsched</code></td> <td> <ul> <li><code>PTHREAD_INHERIT_SCHED</code></li> <li><code>PTHREAD_EXPLICIT_SCHED</code></li> </ul> </td> <td><code>PTHREAD_INHERIT_SCHED</code></td> <td><code>pthread_attr_getinheritsched()</code> 和 <code>pthread_attr_setinheritsched()</code></td> </tr> <tr> <td><code>scope</code></td> <td> <ul> <li><code>PTHREAD_SCOPE_SYSTEM</code>（系统级线程，可以被所有进程访问）</li> <li><code>PTHREAD_SCOPE_PROCESS</code>（进程级线程，只能被创建此线程的进程访问）</li> </ul> </td> <td><code>PTHREAD_SCOPE_SYSTEM</code></td> <td><code>pthread_attr_getscope()</code> 和 <code>pthread_attr_setscope()</code></td> </tr> </table>
+
+</body>
+</html>

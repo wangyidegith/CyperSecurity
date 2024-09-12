@@ -1,0 +1,2 @@
+ping ip [-c count] [-I ip]
+    测试网络连通性，[-I ip]意在指定源地址

@@ -1,0 +1,26 @@
+read命令用于从标准输入获取信息，read命令常用shell脚本中，其基本格式如下：
+`read [option] [variables]`
+
+1 -p：指定提示符
+`
+read -p "请输入您的姓名: " name
+echo "您的姓名是：$name"
+`
+
+2 -s：隐藏用户如输入的内容，常用于输入密码
+`
+read -s -p "请输入密码: " password
+echo "您输入的密码是：$password"
+`
+
+3 -a：将输入保存到数组中
+`
+read -a numbers
+echo "您输入的数字是：${numbers[@]}"
+`
+
+4 -t：设置超时
+`
+read -t 5 -p "请输入内容（5秒超时）: " input
+echo "您输入的内容是：$input"
+`

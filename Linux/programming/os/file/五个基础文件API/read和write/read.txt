@@ -1,0 +1,20 @@
+#include <unistd.h>
+ssize_t read(int fd, void* buf, size_t count);
+
+返回值：
+	>0：读到的字节数
+	=0：读到文件末尾会返回0，如果描述符是一个socket，则在对端close时返回0
+	<0：一般为-1，表示错误；
+	这里插一条知识点：阻塞非阻塞是针对fd来说的而非API，也可以针对API
+	在阻塞模式下，如果无数据可读，read会一直阻塞，直到有数据可读或者发生错误
+	非阻塞情况下，无数据可读时会返回-1，设置错误码为EAGAIN或EWOULDBLOCK，两个都是11
+
+参数：
+	count和buf之间的关系：
+		count>sizeof(buf)：造成内存溢出
+		count<sizeof(buf)：造成内存浪费
+		count=sizeof(buf)：恰到好处（因而我们一般这样设置）
+	count和fd可用数据长度（fd的可用数据长度不由程序员决定，是随机的）之间的关系：
+		count>fd可用数据长度：读fd可用数据长度返回
+		count<fd可用数据长度：读count返回
+		count=fd可用数据长度：恰到好处，这是最理想的情况

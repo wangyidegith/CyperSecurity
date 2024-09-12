@@ -1,0 +1,33 @@
+ssh: connect to host 139.180.132.144 port 1394: Connection timed out
+像以上这种问题就是防火墙没allow1394端口造成的。
+
+ufw：uncpmplicated firewall（简易版iptables）
+1 安装
+apt install ufw
+2 启用
+ufw enable
+3 查看状态
+ufw status
+能看到：ufw是否启用（启用了就是屏蔽主机上的所有端口，IP地址不知道），设置了哪些规则（允许谁进谁出，不允许谁进谁出）
+4 禁用
+ufw disable
+5 重载（如果添加了新规则最好重载一次）
+ufw reload
+6 查看详细的应用程序信息
+ufw app list
+7 查看日志
+ufw status verbose
+8 重置（复原）
+ufw reset
+9 允许/拒绝特定端口的流量
+ufw allow <port_number>
+ufw deny <port_number>
+10 允许/拒绝特定应用程序的流量
+sudo ufw allow <application_name>
+sudo ufw deny <application_name>
+11 允许/拒绝特定IP地址或子网的流量
+sudo ufw allow from <ip_address>
+sudo ufw deny from <ip_address>
+12 删除规则
+sudo ufw status numberd
+sudo delete number

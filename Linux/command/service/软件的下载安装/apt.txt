@@ -1,0 +1,19 @@
+从universe里安装
+
+apt update
+用于更新软件包列表。
+apt upgrade
+用于升级系统中已安装的软件包
+apt install
+apt remove
+用于卸载软件包，但保留与软件包关联的配置文件。
+apt purge
+用于卸载软件包，但会完全移除软件包及其关联的配置文件。
+apt clean
+删除系统中已下载的软件包文件，但不会影响已安装的软件包或配置文件。
+apt-cache search <关键词>
+apt-cache show <软件包名>
+apt check
+检查依赖关系
+
+上述接可以在apt后面加-get，这是apt的低级版本。

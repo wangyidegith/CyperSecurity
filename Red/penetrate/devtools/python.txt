@@ -1,0 +1,412 @@
+一 基本问题
+1 python版本（python命令和python3命令，区别如下）
+（1）python命令对应python2版本，python3命令对应python3版本（python命令的包管理工具是pip，python3是pip3）。
+（2）两个版本的区别还是挺大的，不是小差别，因而兼容性不好，建议只使用一种版本。
+（3）python2版本现在已经停止更新，python3是未来的主要方向，因而建议学习和使用python3。
+
+
+
+二 开发环境（与python3命令有关的工具）
+（一）python3 -m pip（或者pip3）
+1 使用 Python 3.x 版本的 pip 包管理工具。
+2 用于安装、升级、卸载 Python 包，把它当apt使。
+3 例如: python3 -m pip install numpy
+（二）python3 -m venv
+1 创建 Python 3.x 的虚拟环境。
+2 用于隔离不同项目的 Python 依赖包。
+3 例如: 
+（1）创建虚拟环境：python3 -m venv my_env
+（2）激活虚拟环境：
+a 在 Windows 系统上，在命令行中执行以下命令来激活虚拟环境：
+myenv\Scripts\activate
+b 在类 Unix 系统（如 macOS、Linux）上，执行以下命令来激活虚拟环境：
+source myenv/bin/activate
+（3）使用。
+（4）deactivate。
+（三）python3 -m unittest
+1 运行 Python 3.x 版本的单元测试框架。
+2 这个功能说白了就是方便我们不再写main函数。
+3 例如: 
+（1）编写一个单元测试文件（里面要import unittest），比如：
+import unittest
+
+def multiply(a, b):
+    result = a * b
+    print(f"{a} * {b} = {result}")  # 假设这里有一个输出语句
+    return result
+
+class TestMultiplyFunction(unittest.TestCase):
+
+    def test_multiply_positive_numbers(self):
+        expected_result = 15
+        actual_result = multiply(3, 5)
+        self.assertEqual(actual_result, expected_result)
+
+    def test_multiply_negative_numbers(self):
+        expected_result = -6
+        actual_result = multiply(2, -3)
+        self.assertEqual(actual_result, expected_result)
+
+if __name__ == '__main__':
+    unittest.main()
+（2）python3 -m unittest ./
+（四）python3 -m pdb
+1 启动 Python 3.x 版本的交互式调试器。
+2 用于调试 Python 代码。
+3 例如: python3 -m pdb my_script.py
+（五）python3 -m http.server
+1 启动 Python 3.x 版本的简单 HTTP 服务器。
+2 用于快速构建本地 Web 服务。
+3 例如: python3 -m http.server 8000
+
+
+
+三 python2和python3的主要语法区别
+1 print 语句
+Python 2.x 使用 print 语句
+Python 3.x 使用 print() 函数
+2 除法运算
+Python 2.x 中,两个整数相除结果仍为整数
+Python 3.x 中,两个整数相除结果为浮点数
+3 字符串编码（这是一个重要区别，b和u的区别）
+（1）总的来说：
+Python 2.x 默认使用 ASCII 编码
+Python 3.x 默认使用 Unicode (UTF-8) 编码
+（2）细说：
+Python 3:
+普通字符串为 Unicode 字符串。
+创建字节字符串需使用 b'hello' 的形式。
+Python 2:
+普通字符串为字节字符串。
+创建 Unicode 字符串需要使用 u'hello' 的形式。
+（3）python3的普通字符串和字节字符串的转化：
+b = s.encode("utf-8")
+s = b.decode("utf-8")
+4 xrange 函数
+Python 2.x 中使用 xrange() 生成序列
+Python 3.x 中使用 range() 替换了 xrange()
+5 异常处理
+Python 2.x 使用 except ExceptionType, e
+Python 3.x 使用 except ExceptionType as e
+6 输入函数
+Python 2.x 使用 raw_input()
+Python 3.x 使用 input() 替换了 raw_input()
+7 类定义
+Python 2.x 中类需要显式继承 object
+Python 3.x 中类默认继承 object
+8 next() 函数
+Python 2.x 中使用 next(iterator)
+Python 3.x 中 next() 函数被重命名为 __next__()
+9 模块导入
+Python 2.x 中使用 from module import *
+Python 3.x 中不建议使用 from module import *
+这些是 Python 3.x 与 2.x 版本之间的一些主要语法差异。掌握这些差异可以帮助你更好地编写 Python 3.x 代码。
+
+
+
+四 python3 的主要语法
+（零）注释：
+单行：#
+多行：
+'''
+'''
+（一）运算和控制
+1 控制
+（1）基本（缩进换行）：
+a 这或许是python与其他语言最大的不同：使用缩进而非{}表示代码块。
+b 可以不使用”;“，建议不要用，用换行更清晰。
+（2）条件：if-elif-else，没有switch-case（python有字典）。
+示例：
+def switch_case_example(argument):
+    if argument == 1:
+        print("You chose option 1")
+    elif argument == 2:
+        print("You chose option 2")
+    elif argument == 3:
+        print("You chose option 3")
+    else:
+        print("Invalid choice")
+（3）循环：for-in，while，没有do-while。
+示例：
+for 变量 in 可迭代对象:
+    # 循环体内的代码块
+    # 可以使用变量来访问每个迭代的元素或键值对
+2 运算：
+（1）幂运算符：**
+（二）数据（没有C语言的内存概念，但是你也得知道：函数的变量在栈上，剩下的都是在堆上（python的机制是变量名在栈上，变量在堆上，变量名相当于CPP的引用））
+1 基本数据类型（8种，除了数字和布尔，其他的都是可迭代对象）：
+（1）数字类型:
+整数(int): 表示整数,例如 42、-10。
+浮点数(float): 表示浮点数(小数),例如 3.14、2.718。
+复数(complex): 表示复数,例如 3+4j。
+（2）布尔类型(bool): 表示真(True)或假(False)。
+（3）字符串类型(str): 表示文本数据，这是超级重点，
+a 用单引号'、双引号"括起来,例如 "Hello, World!"、'Python 3.x'。
+b python有三种格式字符串：
+（a）普通字符串：s = "comman str"；
+（b）字节字符串：sb = b"bytes str"
+（c）格式字符串，有三种方法：
+name = "Alice"
+age = 25
+第一种：print("Name: %s, Age: %d" % (name, age))
+第二种：print("Name: {}, Age: {}".format(name, age))
+第三种：print(f"Name: {name}, Age: {age}") # 这是常用方法
+（4）其他序列类型（序列类型总共四个）:
+列表(list): 有序的可变集合,用方括号[]表示,例如 [1, 2, 3, 'a', 'b']。
+元组(tuple): 有序的不可变集合,用圆括号()表示,例如 (1, 2, 3, 'a', 'b')。
+范围(range): 表示一个数字序列,用 range() 函数创建,例如 range(1, 11)。
+（5）映射类型:
+字典(dict): 无序的键值对集合,用花括号{}表示,例如 {'name': 'Alice', 'age': 25}。
+（6）集合类型:
+集合(set): 无序的唯一元素集合,用花括号{}表示,例如 {1, 2, 3, 'a'}。
+2 构造数据类型：
+（1）函数：
+def function_name(arg1, arg2, ...):
+    # 函数体
+    return value
+（2）对象（cpp的栈创建方式，但是实际上在堆区，它没有new，JS和PHP是new）：
+a 封装（python没有CPP的复杂的变量限制都是public，但是约定俗成使用__前缀的变量表示private，使用_前缀的变量表示protected，但是仅仅是约定俗成，只能靠用户自觉了）：
+（a）基本格式和概念（我说的操作既指访问也指修改）：
+class MyClass:
+    # 类变量（属于类而非对象）：在init外定义的任何变量都是类变量
+    class_variable = 10
+    # 初始化方法（构造函数）
+    def __init__(self, x, y):
+        # 实例变量：只能在构造函数里定义
+        self.x = x
+        self.y = y
+    # 实例方法：这一点和CPP一样，可以操作类变量和实例变量，也可以新增加实例变量，也可以操作局部变量，总之它声明变量都能操作
+    def instance_method(self):
+        return f'Instance method called with x={self.x} and y={self.y}'
+    # 类方法：只能操作类变量
+    @classmethod
+    def class_method(cls):
+        return f'Class method called with class variable={cls.class_variable}'
+    # 静态方法：什么都不能操作
+    @staticmethod
+    def static_method():
+        return 'Static method called'
+（b）上面提到的三种方法：实例、类、静态汇总
+实例方法什么都能操作但是最好只操作实例变量，只能被实例调用；
+类方法只能操作类变量，能被实例和类调用但是最好只被类调用；
+静态方法什么都不能操作，能被实例和类调用，这个调用随意，这个方法很有用可以将一些和变量无关的操作放在这。
+（c）装饰器：上面看到的@就是装饰器，有如下：
+@staticmethod
+@classmethod
+@property：将方法当作属性
+@abstractmethod：
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        pass # 学一学python如何定义一个空函数
+b 继承（没有CPP的三种继承方式就是public）：
+class ParentClass:
+    # 父类的属性和方法定义
+class ChildClass(ParentClass):
+    # 子类继承父类，可以添加自己的属性和方法
+c 多态：
+在继承中对函数想重写直接写；
+使用@abstractmethod定义虚函数。
+（三）with as
+1 with 语句是 Python 中用于管理上下文的一种语法结构。
+2 它通常用于处理需要在使用后释放资源的对象,例如文件、锁和数据库连接等。
+3 使用 with 语句的优点包括:
+（1）简洁性:用 with 语句可以大幅简化资源的打开和关闭操作。
+（2）异常安全性:即使在处理过程中发生异常,with 语句也能确保资源被正确地关闭。
+（3）可读性:with 语句能清楚地表明资源的作用域,提高代码的可读性。
+（四）异常处理：C语言的异常处理机制就是-1+error-num，但是python不返回-1，返回了就是成功了，不成功就不返回而是跑到except块。
+1 关键字：try-except-else-finally-raise-as。
+（1）try：代码执行的地方；
+（2）except：出错了执行这；
+（3）else：没出错执行这；
+（4）finally：不管出没出错都得执行这。
+示例：
+try:
+    result = 10 / 0
+except ZeroDivisionError as e:
+    print("Error: Division by zero")
+else:
+    print("Result:", result)
+finally:
+    print("This code will be executed regardless of whether an exception occurs or not.")
+（5）raise示例：
+def divide(a, b):
+    if b == 0:
+        raise ZeroDivisionError("Cannot divide by zero")
+    return a / b
+（6）as：每一个异常类型都是类，as的目的是为了创建一个该类的实例。
+2 异常类型：
+（1）基本异常类型:
+Exception: 所有内置异常的基类。（不知道什么异常就用它就行了）
+StandardError: 所有内置标准异常的基类。
+（2）算术错误 (ArithmeticError):
+ZeroDivisionError: 当试图除以零时会引发这个异常。例如: 1 / 0 会抛出 ZeroDivisionError。
+OverflowError: 当计算结果超出可表示的最大或最小值时会引发这个异常。例如: 10 ** 1000 会抛出 OverflowError。
+FloatingPointError: 当浮点数计算出现精度损失时会引发这个异常。这种情况比较罕见,通常 Python 会自动处理浮点数精度问题。
+（3）查找异常 (LookupError):
+IndexError: 当试图访问序列（如列表、元组、字符串）中不存在的索引时会引发这个异常。例如: [1, 2, 3][4] 会抛出 IndexError。
+KeyError: 当试图访问字典中不存在的键时会引发这个异常。例如: {"a": 1}["b"] 会抛出 KeyError。
+AttributeError: 当试图访问对象的不存在属性时会引发这个异常。例如: "hello".does_not_exist 会抛出 AttributeError。
+（4）文件和 I/O 异常:
+IOError: 表示 I/O 操作失败,例如打开文件或读写文件时出错。
+FileNotFoundError: 表示文件或目录不存在。
+PermissionError: 表示没有访问文件的权限。
+EOFError: 表示在没有更多输入的情况下,遇到了文件结束符 (EOF)。
+（5）内存管理异常:
+MemoryError: 表示内存不足,无法分配更多内存。
+（6）语法和命名异常:
+SyntaxError: 表示代码存在语法错误。
+NameError: 表示使用了未定义的变量或函数名。
+（7）类型异常:
+TypeError: 表示操作或函数参数类型不正确。
+ValueError: 表示函数收到了正确类型但值不合适的参数。
+（8）系统相关异常:
+ImportError: 表示导入模块失败。
+NotImplementedError: 表示某个方法或功能尚未实现。
+OSError: 表示操作系统相关的错误。
+
+
+
+五 可迭代对象：可迭代对象(Iterable)是指那些可以被迭代遍历的对象。在 Python 中,可迭代对象指实现了 __iter__() 方法或者 __getitem__() 方法的对象。
+1 哪些是可迭代对象？（所有的序列类型和集合、字典、文件，7种）
+字符串 str
+列表 list
+元组 tuple
+范围 range
+其他内置类型:
+集合 set
+字典 dict
+文件对象 file
+2 如何操作？
+（1）使用iter() 和 next()：
+my_list = [1, 2, 3, 4, 5]
+my_iter = iter(my_list)  # 获取 my_list 的迭代器
+print(next(my_iter))  # 输出第一个元素：1
+print(next(my_iter))  # 输出下一个元素：2
+（2）使用for-in
+my_list = [1, 2, 3, 4, 5]
+for item in my_list:
+    print(item)
+
+
+
+六 常见的内置函数和对象（主要是函数，非常有用）
+（一）内置对象:
+1 None: 表示空值或缺失值。
+2 True/False: 布尔值。
+3 __builtins__: 包含所有内置函数和对象的命名空间。
+（二）数学相关:
+1 abs(x): 返回数字的绝对值。
+2 min(x1, x2, ...): 返回给定参数的最小值。
+3 max(x1, x2, ...): 返回给定参数的最大值。
+4 sum(iterable, start=0): 返回可迭代对象中元素的总和。
+5 pow(x, y): 返回 x 的 y 次幂。
+（三）字符串相关（这个非常重要）:
+1 len(s): 返回字符串、列表或其他序列的长度。
+2 str(x): 将对象转换为字符串，返回值是字符串。
+3 split(sep=None): 将字符串按指定分隔符分割为列表。从字符串到列表。
+示例：
+,：
+text = "apple,banana,cherry"
+fruits = text.split(",")
+print(fruits)  # 输出: ['apple', 'banana', 'cherry']
+line = "Hello World Python"
+默认空白字符：
+words = line.split()
+print(words)  # 输出: ['Hello', 'World', 'Python']
+4 join(iterable): 将可迭代对象中的元素用指定字符串连接起来。从可迭代对象到字符串。
+,：
+fruits = ['apple', 'banana', 'cherry']
+joined_fruits = ",".join(fruits)
+print(joined_fruits)  # 输出: "apple,banana,cherry"
+ ：
+words = ["Hello", "World", "Python"]
+sentence = " ".join(words)
+print(sentence)  # 输出: "Hello World Python"
+示例：
+（四）列表相关:
+list(iterable): 将可迭代对象转换为列表。将任何可迭代对象转为列表，列表是最常用的可迭代对象。
+append(item): 在列表末尾添加新的元素。
+pop(index=-1): 删除并返回指定索引处的元素。
+（五）类型转换:
+int(x): 将对象转换为整数。
+float(x): 将对象转换为浮点数。
+bool(x): 将对象转换为布尔值。
+
+
+
+七 文件操作
+（一）打开文件：open(file, mode='r', buffering=-1, encoding=None)
+1 参数：
+mode：
+'r': 读模式(默认)
+'w': 写模式(会覆盖原有内容)
+'a': 追加模式(在文件末尾添加内容)
+'r+': 读写模式
+2 返回值：文件对象（设为file）。
+3 一个不错的固定写法：
+try:
+    # 尝试打开文件并读取内容
+    with open("example.txt", "r") as file:
+        content = file.read()
+        print(f"File content: {content}")
+except FileNotFoundError:
+    # 捕获文件不存在的异常
+    print("Error: File not found.")
+except PermissionError:
+    # 捕获权限不足的异常
+    print("Error: Insufficient permissions to access the file.")
+except IOError as e:
+    # 捕获其他 I/O 异常
+    print(f"Error: {e}")
+（二）读：file.read(size=-1)
+1 参数：
+-1为默认值，全部读完。
+2 返回值：一个表示读取内容的字符串。
+（三）写：file.write(s)
+1 参数：要写的字符串。
+2 返回值：成功写入的字符数。
+（四）关闭文件：file.close()
+
+
+
+八 模块（一个目录 == 一个包（目录下会有一个__init__.py文件），一个模块 == 一个.py文件）
+（一）作用：重用、维护
+（二）如何使用？
+1 import module_name
+2 import module_name as alias
+3 from module_name import function_name, ClassName
+4 from module_name import * # python3 不建议这么做，会造成命名空间污染
+（三）模块搜索路径
+Python 解释器在import模块时会按照一定的搜索顺序来查找模块。主要的搜索路径包括：
+1 当前目录
+2 环境变量 PYTHONPATH 指定的路径
+3 Python 内置的默认路径（一直说的sys.path到底是什么？）：
+import sys
+print(sys.path)
+你也可以使用sys.path.insert或者sys.path.append去加入模块路径以作临时测试用。
+（四）if __name__ == "__main__": ：通常情况下，我们希望某些代码只在模块被直接执行时运行，而在被导入时不运行，这时就可以使用 if __name__ == "__main__":。
+
+
+
+九 socket
+（一）socket.socket():
+创建一个新的套接字对象。语法为 socket.socket(family, type, proto=0, fileno=None)，其中 family 是地址族（如 AF_INET 表示IPv4，AF_INET6 表示IPv6），type 是套接字类型（如 SOCK_STREAM 表示TCP套接字，SOCK_DGRAM 表示UDP套接字），proto 是协议号（默认为0），fileno 是可选的文件描述符（默认为 None）。
+（二）socket.bind(address):
+将套接字绑定到指定的地址。address 是一个元组，包含主机名（或IP地址）和端口号。
+（三）socket.listen(backlog):
+开始监听连接请求。backlog 是在拒绝新连接之前，操作系统可以挂起的最大连接数量。
+（四）socket.accept():
+接受连接并返回一个新的套接字对象和连接地址。用于服务器端，当有客户端连接时，它会阻塞程序运行，直到有连接请求到来。
+（五）socket.connect(address):
+连接到指定的远程套接字地址。address 是一个元组，包含远程主机名（或IP地址）和端口号。
+（六）socket.send(bytes):
+发送数据到连接的套接字。参数 bytes 是要发送的字节数据。
+（七）socket.recv(bufsize):
+接收数据。bufsize 指定要接收的最大数据量。返回接收到的字节数据。
+（八）socket.close():
+关闭套接字连接。
+
+
+
+十 os：这个库很重要，需要用就问chat

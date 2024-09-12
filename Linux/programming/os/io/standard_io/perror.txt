@@ -1,0 +1,16 @@
+头文件：stdio.h
+函数定义：void perror(const char* s);   // 这个函数的参数可没有占位符这么一说啊，你要是想用占位符，可以使用fprintf(stderr)
+函数说明：当我们调用这个函数时会发生什么？会以下面的形式输出***上一次发生错误（即返回值为-1）的系统API函数或者C库函数***的错误信息：
+		s,错误原因字符串（此错误原因字符串依照全局变量errno的值来决定要输出什么）
+
+头文件：errno.h
+变量定义：extern int errno
+变量说明：错误编号。
+		对错误编号的解释：当一个API或者库函数返回-1时，内核为我们做了这样一件事情：内核根据发生错误的原因在
+                                 /usr/include/asm-generic/errno-base.h（第1-34个错误宏定义）和/usr/include/asm-generic/errno.h（第35-133个错误宏定义）中寻找到对应的错误宏，
+                                 并将此宏的值赋给了全局变量errno
+	几个常见的错误编号：
+		EBADF：无效fd
+		EAGAIN：非阻塞时，写发现满了，读发现空了
+		EINTR：被信号中断
+		EINVAL：无效参数

@@ -1,0 +1,24 @@
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+int fstat(int fd, struct stat *buf);
+返回值：成0败-1
+参数：fd：文件描述符
+          buf：这是一个传出参数，用来存储文件元数据
+           	文件元数据如下：
+		struct stat {
+    			dev_t         st_dev;      /* 文件的设备 ID */
+   			ino_t         st_ino;      /* inode 编号 */
+    			mode_t        st_mode;     /* 文件类型和访问权限 */
+    			nlink_t       st_nlink;    /* 链接数 */
+    			uid_t         st_uid;      /* 文件的用户 ID */
+    			gid_t         st_gid;      /* 文件的组 ID */
+    			dev_t         st_rdev;     /* 设备的 ID */
+    			off_t         st_size;     /* 文件的大小（字节数） */
+    			blksize_t     st_blksize;  /* 文件系统 I/O 缓冲区的大小 */
+   			blkcnt_t      st_blocks;   /* 文件系统中分配的块数 */
+    			struct timespec st_atim;   /* 文件最后一次访问的时间 */
+    			struct timespec st_mtim;   /* 文件的最后一次修改时间 */
+    			struct timespec st_ctim;   /* 文件的最后一次状态改变时间 */
+		};

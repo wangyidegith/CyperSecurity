@@ -1,0 +1,32 @@
+一 命名语法
+1 变量名可以包含字母、数字以及下划线 _，但数字不能打头。
+2 区分大小写。
+
+
+
+
+
+
+二 命令约定
+驼峰命名法（Camel Case，面向对象语言（cpp，Java，python）常用，已经成为命名标准了）：
+小驼峰式命名法（lowerCamelCase）：第一个单词小写，后续每个单词的首字母大写，例如：firstName, calculateInterest.
+大驼峰式命名法（UpperCamelCase 或 PascalCase）：每个单词的首字母都大写，例如：CarModel, CalculateInterest.
+
+
+
+下划线命名法（Snake Case，C语言常用）：
+所有字母小写，单词之间用下划线 _ 分隔，例如：first_name, calculate_interest.
+
+
+
+匈牙利命名法（Hungarian Notation）：
+在变量名前加上一个或多个小写字母前缀来表示变量的类型或其他属性，如 strFirstName（str 表示字符串类型）。
+
+
+
+个人最佳实践：
+文件名全小写
+类名大驼峰
+函数名小驼峰
+常量、宏定义全大写
+变量全小写，如果涉及多个单词则用下划线

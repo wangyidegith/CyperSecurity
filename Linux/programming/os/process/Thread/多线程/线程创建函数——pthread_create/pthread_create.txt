@@ -1,0 +1,19 @@
+#include <pthread.h>
+int pthread_create(pthread_t* thread, const pthread_attr_t* attr, void* (*start_routine) (void*), void* arg);
+返回值：成0败非0
+参数：
+	thread：传出参数
+	attr：线程属性，以下是POSIX标准的pthread_attr_t结构
+		typedef struct pthread_attr_s {
+    			void* stackaddr;        // 线程栈地址
+    			size_t stacksize;       // 线程栈大小
+    			int detachstate;        // 线程分离状态
+    			int schedpolicy;        // 线程调度策略
+    			struct sched_param schedparam;   // 线程调度参数，该结构只有一个成员：int sched_priority;
+    			int inheritsched;       // 线程调度继承属性
+    			size_t guardsize;       // 线程栈警戒区大小，在一些嵌入式系统中，栈也是共享的，因而需要设置警戒区以免内存共享的情况发生
+    			int scope;              // 线程竞争范围
+		} pthread_attr_t;
+	start_routine：这是一个函数指针，指向线程函数，pthread_create所创建的线程将在该函数内部运行
+	arg：线程函数的参数
+

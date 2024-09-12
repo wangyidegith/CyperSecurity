@@ -1,0 +1,34 @@
+方法一：将该程序设置为一个service并enable。对应Windows的服务。
+1 sudo vim /etc/systemd/system/your_program.service
+```
+[Unit]
+Description=Your Program   // 请修改
+After=network.target
+[Service]
+ExecStart=/path/to/your-program   // 请修改
+Restart=always
+User=your-username   // 请修改
+[Install]
+WantedBy=multi-user.target
+```
+
+2 sudo systemctl enable your-program.service
+
+
+
+
+
+
+
+方法二：对应Windows的任务计划程序。
+1 sudo crontab -e
+
+2 @rebbot /path/to/your-program
+
+
+
+
+
+
+
+方法三：将运行程序的指令写成一段代码通过动态库注入的方式注入到某些已经被系统开机自启的程序里，这是APT中后门持久化的常用方式。

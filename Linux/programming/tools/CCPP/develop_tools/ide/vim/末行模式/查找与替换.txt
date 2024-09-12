@@ -1,0 +1,23 @@
+s代表字符串；
+
+替换该句中找到的第一个int为float：s/int/float
+
+
+
+替换该句中所有int为float：s/int/float/g
+
+
+
+替换整个文本中每一句的第一个int为float：%s/int/float
+
+
+
+替换整个文本中所有的int为float：%s/int/float/g	*******
+
+
+
+替换整个文本中所有的int为float并每次询问：%s/int/float/gc	*******
+
+
+
+替换第三行到第十行的所有int为float：3,10s/int/float/g

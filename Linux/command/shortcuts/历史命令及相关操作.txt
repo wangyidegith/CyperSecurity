@@ -1,0 +1,4 @@
+查看历史命令：history
+获得上一个命令：Ctrl + p
+获得下一个命令：Ctrl + n
+查询历史明明：Ctrl + r

@@ -1,0 +1,7 @@
+RDDS是"Registration Data Directory Service"的缩写,是一种提供域名注册信息查询服务的标准。
+
+RDDS主要包括以下几个核心组成部分:
+
+Whois服务 - 通过whois协议提供域名注册者联系信息等基本查询。
+Web-based Directory - 通过网页形式提供域名注册信息查询。
+APIs - 为程序提供编程接口以自动化查询域名注册数据。

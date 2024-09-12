@@ -1,0 +1,4 @@
+#include <unistd.h>
+int unlink(const char *pathname);
+返回值：成0败-1
+参数：义同名

@@ -1,0 +1,4 @@
+创建：
+	sudo addgroup（groupadd） 用户组
+删除：
+	sudo delgroup（groupdel） 用户组

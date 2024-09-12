@@ -1,0 +1,26 @@
+1 下载
+curl URL
+
+2 -o <保存到这个文件>
+
+3 发送post请求
+curl -X POST -d "param1=value1&param2=value2" https://www.example.com/api
+
+4 添加HTTP头
+curl -H "Content-Type: application/json" -d '{"key":"value"}' https://www.example.com/api
+
+5 模拟浏览器行为
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3" https://www.example.com
+
+6 跟随重定向
+curl -L https://bit.ly/example-url
+
+7 认证
+curl -u username:password https://www.example.com/protected-resource
+
+8 现实请求/响应头信息
+curl -i https://www.example.com
+
+9 并发多个请求
+curl -s https://www.example.com & curl -s https://www.another.com &
+-s是静默模式

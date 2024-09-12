@@ -1,0 +1,18 @@
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+17 *    * * *   root    cd / && run-parts --report /etc/cron.hourly
+
+注意：
+1 使用绝对路径来指定命令或脚本的位置，以避免环境变量问题。
+2 如果需要输出任务执行的结果或错误信息，可以将输出重定向到日志文件中，例如 ：
+* * * * * /path/to/your/command >> /path/to/your/logfile 2>&1
+3 如果希望开机执行，可以：
+@reboot /path/to/your/command args
+
+强调：命令得绝对路径

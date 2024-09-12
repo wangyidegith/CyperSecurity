@@ -1,0 +1,8 @@
+show:
+arp -a [hostname/ipaddr]
+
+add item:
+arp -s <ipaddr> <macaddr>
+
+del item:
+arp -d <ipaddr>

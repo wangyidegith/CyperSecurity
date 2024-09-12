@@ -1,0 +1,24 @@
+1 
+sudo vim /etc/netplan/一个yaml文件
+
+2 
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:   # 根据你的网络接口名称修改
+      dhcp4: no
+      addresses:
+        - 192.168.1.100/24   # 设置你的静态IP地址和子网掩码
+      gateway4: 192.168.1.1  # 设置网关地址
+      nameservers:
+        addresses:
+          - 8.8.8.8   # 设置DNS服务器地址，一般是网关
+          - 8.8.4.4   # 备用，可以选一个电信的或者阿里的
+
+3 sudo netplan apply
+
+netplan命令：
+该命令其实就是ip link的高级版，也是ifupdown的升级版。
+相比于ip link，它可以永久配置接口信息；
+相比于ifupdown，它在 Ubuntu 17.10 及更新版本中取代了传统的 ifupdown 工具。

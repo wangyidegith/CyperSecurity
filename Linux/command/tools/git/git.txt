@@ -1,0 +1,131 @@
+零 基本概念：
+定义：
+	git是一个版本控制系统。
+网站：
+	https://git-scm.com
+功能：
+	代码托管、版本控制、协作开发。
+特点：
+	免费、开源、分布式（集中式svn、cvs）。
+产品：
+	Gitlab：
+		取决于搭建的位置。
+	Github：微软搭建的gitlab，供全地球所有开发者免费使用，是最大的git网站。
+		https://github.com
+	Gitee：华为搭建的gitlab，主要供中国大陆开发者使用。
+		https://gitee.com
+仓库（又叫版本库，英文为repository，简称repo）：
+	git使用了一种名为repository的数据库来记录文件的变化，这些变化表现为谁在什么时间修改了哪些部分。
+
+
+
+
+
+
+
+二 git命令：为了区分Linux下的其它命令，所有的git命令都是以git开头的
+（一）系统级命令:
+git --version
+	查看git版本
+git config --global user.name "wy"
+git config --global user.email wydegl@gmail.com
+	以上两条命令往往是刚刚安装好git后配置git的第一步。
+	关于--global：
+	default : 本地配置，只对本地仓库有效
+	--global : 全局配置，对所有仓库生效（一般使用这个）
+	--system : 系统配置，对所有用户生效
+git config --global credential.helper store
+	保存用户名和邮箱信息
+git config --global --list
+	显示配置信息
+
+
+
+（二）仓库级基本命令：
+git init
+	下面是本文档中最重要的理解：1 什么是仓库？ 2 怎么创建仓库？——git init 3 特点：.git
+		git是一个版本控制工具，它最核心的功能就是控制开发者项目的版本，它最核心的要素是仓库，一个仓库对应了一份代码。
+		一份代码肯定是放在一个目录里啊，所以一个仓库也就是一个目录，只是这个目录被git这个工具管理了。
+		那么，一个普通的目录如何成为一个git仓库呢？
+		在该目录下执行命令：git init
+		就好了。
+		或者也可以使用命令（git init 目录名）来创建一个git仓库。
+		init之后，该目录下会出现一个.git目录。
+git clone
+	git init将自己的某个目录变成git仓库，git clone是下载别人的git仓库（以.git作为结尾），这样我们就直接拿到了一个git仓库，里面存放了别人的代码和.git目录。
+git add和git commit
+	在工作中，我们往往需要三个命令才能提交代码，最后一个是git push，这个是远程操作再议，前两个就是我们这里要说的git add和git commit，这是本地操作。
+	那么为什么在本地提交代码需要两步呢？这是因为一个git目录中有三个重要的区域：
+		工作区（.git所在目录中除了.git以外的其它区域）
+			这里存放了我们的代码和相关文件，我们在这里做修改操作，一旦修改完成，需要提交，我们要使用：
+				git add（常用：使用通配符*，使用.表示当前目录）
+			将代码提交至暂存区。
+		暂存区（.git/index）
+			然后我们需要使用：
+				git commit -m "对本次提交的说明"
+			将代码提交至本地仓库。
+			注意：1 git commit只会提交暂存区中的文件；2 可以使用git log查看提交的历史记录（git log --online以简洁形式展示记录）
+		本地仓库（.git/objects）
+			到这被修改的代码才算是提交了。
+			注意：虽然这个区域的名字叫本地仓库，但是它可不是我们在日常工作中说到的仓库，日常工作中说到的仓库指的是.git所在的整个目录。
+git status
+	查看某条命令执行后的工作区和暂存区中的文件状态，如果想查看本地仓库的提交记录，使用git log
+	文件状态：
+		untracked : 从未被add过或者add过但rm --cached了的文件的状态
+		tracked(如果修改了，以modified表示这个状态) : 只要被add过
+			staged : 修改后，add了，表现为绿色modified
+			unstaged : 修改后但是没有add，表现为红色modified
+		deleted : 已删除
+git ls-files
+	查看tracked状态下的文件（也就是被git管理了的文件，就是暂存区中的文件内容）
+git log
+	查看提交记录
+git rm -f
+	同时删除工作区和暂存区中的文件，等同于rm+git add
+git rm -f --cached
+	只删除暂存区中的文件
+git reset --mode 版本ID（通过git log（u）或者git reflog（Ctrl + r））
+	--soft : 工作区和暂存区中的文件都不会删除
+	--hard : 工作区和暂存区中的文件都会删除
+	--mixed : 工作区不删除，暂存区删除，是默认方式
+
+
+
+（三）分支命令
+git branch
+	查看有哪些分支
+git branch 分支名称
+	创建分支
+git switch 分支名称
+	切换分支
+git merge 分支名称
+	将该分支合并到当前分支
+git branch -d 分支名称
+	只能删除已合并分支
+git branch -D 分支名称
+	强制删除未合并分支
+git branch -m 旧名 新名
+	给分支修改名称
+	
+
+
+
+（四）远程命令，之所以git是分布式的，就是因为你可以与远程仓库进行交互。远程操作无非就是推和拉，但是涉及两种协议，https和ssh，https无脑下拉，ssh需要在GitHub上配置本地公钥。两个场景，库和库中的内容。
+// 0 在执行以下的远程命令之前，需要先关联远程仓库
+git remote add <给远程仓库起一个本地名> <远程仓库地址>
+git remote -v 
+	查看本地所关联的远程仓库
+
+// 1 拉库，推库
+// 拉库
+git clone https/ssh://.git
+// 推库
+git push -u <远程仓库的本地名> <本地分支名:远程分支名（如果一样:及后面的可以省略）>
+
+// 2 拉，推
+// 拉
+git pull <远程仓库的本地名> <远程分支名:本地分支名（如果一样:及后面的可以省略）>
+git fetch <远程仓库的本地名> <远程分支名:本地分支名（如果一样:及后面的可以省略）>
+// pull和fetch的区别是pull会合并分支而fetch不会。
+// 推
+git push -u <远程仓库的本地名> <本地分支名:远程分支名（如果一样:及后面的可以省略）>

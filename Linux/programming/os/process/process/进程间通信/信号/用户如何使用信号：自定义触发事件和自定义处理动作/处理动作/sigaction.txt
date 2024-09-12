@@ -1,0 +1,17 @@
+#include <signal.h>
+
+       int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+
+返回值：成0败-1
+
+参数：
+signum	要捕获哪个信号
+act	
+	struct sigaction {
+                        void     (*sa_handler)(int);   // 回调函数
+                        void     (*sa_sigaction)(int, siginfo_t *, void *);   // 用来信号传参，因为信号本就是以开销小著称，这个功能就略显鸡肋了
+                        sigset_t   sa_mask;   // 在信号捕获函数sigaction执行期间，使用的屏蔽集
+                        int        sa_flags;   // 一般设为0，可以设置系统调用被信号中断后是中断还是重启，这是我难以理解的一件事情，这个系统调用到底指谁啊！
+                        void     (*sa_restorer)(void);   // 弃用
+                };
+oldact	这是一个传出参数，用来保存之前的屏蔽集

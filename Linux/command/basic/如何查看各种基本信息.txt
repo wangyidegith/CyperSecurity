@@ -1,0 +1,11 @@
+hostnamectl
+信息如下：
+ Static hostname: hkyn2mxj1VsKKGM
+       Icon name: computer-vm
+         Chassis: vm
+      Machine ID: b690a3ef3b7e1dcef0aba40707205606
+         Boot ID: 31d7fa66589147fd819af76d1b9cdb18
+  Virtualization: kvm
+Operating System: Ubuntu 22.04 LTS
+          Kernel: Linux 5.15.0-30-generic
+    Architecture: x86-64

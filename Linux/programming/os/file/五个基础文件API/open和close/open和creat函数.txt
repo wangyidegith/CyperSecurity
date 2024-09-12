@@ -1,0 +1,26 @@
+#include <fcntl.h>
+
+int open(const char *pathname, int flags);
+int open(const char *pathname, int flags, mode_t mode);
+
+返回值：成功返回打开或创建的fd，失败返回-1
+
+参数：
+	pathname：要创建或打开的文件的路径
+	flags：
+		O_RDONLY：以只读方式打开文件
+		O_WRONLY：以只写方式打开文件
+		O_RDWR：以读写方式打开文件
+		O_CREAT：如果文件不存在，创建文件；如果文件存在，这个选项没有意义
+		O_TRUNC：如果文件已经存在，则清空文件内容
+		O_EXCL：如果同时使用了 O_CREAT 选项并且文件已经存在，则返回错误；如果文件不存在则创建一个
+		O_APPEND：在写入时将数据追加到文件末尾
+		注意，flags参数必须包含O_RDONLY、O_WRONLY或者O_RDWR中的一个，同时可以位或（|）上述任意多个选项
+	mode：指定新创建的文件的权限，仅当使用O_CREAT选项时有效，使用八进制表示（这里首先需要补充一些关于进制的知识（详见纸上），其次关于这个事情详见Linux命令的chmod）
+		注意：如果该参数被省略，则新创建的文件权限为0666
+
+
+
+#include <fcntl.h>
+
+int creat(const char *path, mode_t mode);

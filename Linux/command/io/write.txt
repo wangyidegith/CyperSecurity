@@ -1,0 +1,2 @@
+write <user> [tty]
+可以和目标用户的目标tty进行通信。

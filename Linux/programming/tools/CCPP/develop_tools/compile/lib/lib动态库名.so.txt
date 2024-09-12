@@ -1,0 +1,116 @@
+如何制作一个动态库（共享库）呢？
+    ①得到需要制作动态库的.c文件的.o文件：gcc   -o   *.o   -fPIC   -c   *.c
+    ②将.o文件制作为动态库：gcc   -shared   -o   lib动态库名.so   *.o
+
+
+区分三个命令：
+如何寻找一个动态库？
+    ldconfig   -p   |   grep   动态库名
+如何查看该程序带了哪些动态库？
+    ldd   带有动态库的可执行程序
+如何链接.o文件为一个elf？（ld又叫链接器）
+    ld *.o -o elf
+
+
+
+如何使用动态库？（假设动态库是libloader.so，程序是main，源文件是main.c）
+方法一（配置手段）：
+这和静态库一样，你都得把动态库的头文件放到main.c中，然后编译的时候去链接这个动态库，区别在于动态库是在运行时去找。
+一个格式问题：【-L lib -l 动态库名】，也可以没有空格，写成【-L动态库所在目录 -l动态库名】，-L可以不写。
+区别于静态库的是：
+1 本质上不同，静态库在编译的时候就已经编译进去了，动态库却是临时去找，但这一点我们用户看不出来；
+2 我们用户能看出来的是：动态库可以不设置-L，进程会根据一个优先级规则去下面这些地方找动态库：
+	1 用户-L的目录（优先级最高，这种方法虽然优先级最高，但是它不是Linux的标准方法，因而有的时候不能用）
+		gcc -o main main.c -L动态库目录 -lloader
+	2（Linux提供的用于临时测试的接口（LD_LIBRARY_PATH），但是，和终端有关，优先级2）
+		a 
+			export LD_LIBRARY_PATH=动态库所在目录绝对路径（注意！！！动态库所在目录，不要含库，含库不行！）
+			export LD_LIBRARY_PATH=动态库或者动态库所在目录绝对路径（这个可以动态库也可以动态库所在目录）:$LD_LIBRARY_PATH
+			对以上方法的改进：每次重启终端后还是有效：将上面命令放在用户目录的.bashrc中。
+		b 
+			gcc   -o   main   main.c   -L动态库所在目录 -lloader
+	这里多说一种特殊的关于动态库的环境变量：（临时测试，和终端有关，但是相比于上面的，这个方法只能用来做同名替换，并不能用来做加载---LD_PRELOAD）
+		a 
+			export LD_PRELOAD=动态库绝对路径（这不能只到目录，一定得到动态库）
+		b 
+			./main
+
+	3（Linux提供给用户的标准接口也是工作中常用的方法，优先级3）
+        		a 
+			vim /etc/ld.so.conf
+        		b 
+			将动态库的目录路径写到配置文件中，注意是目录路径，不包含库！！！
+        		c 
+			sudo ldconfig [-v]
+				v：显示提示信息
+		d 
+			gcc   -o   main   main.c   -lloader
+	4（标准路径但极不推荐，优先级最低为4）
+		a 
+			把libloader.so放在/lib或/usr/lib（这两个目录内的内容完全一样，你复制一个文件到某个目录中去另一个也有了这个文件，删了两个目录中的都删了）；
+		b 
+			gcc   -o   main   main.c   -lloader
+		为什么极不推荐？因为/lib、/usr/lib是系统动态库存放的位置。
+	通过配置手段的方法，可以看出动态库是要搜索的。
+方法二（编程手段）：dlopen，该方法是通过编程的手段让main在运行时加载libloader.so中的函数或者变量。
+这和静态库加载可不一样，
+1 用户不需要把动态库的头文件放到main.c中；
+2 编译时用户不链接动态库而是链接dl库。
+
+动态库加载模板：
+// main.c
+
+#include <stdio.h>
+#include <dlfcn.h>
+
+typedef void (*HelloFunction)();
+
+int main() {
+    void *handle;
+    HelloFunction hello;
+
+    // 打开动态库
+    handle = dlopen("./libloader.so", RTLD_LAZY);   // 动态库路径
+    if (!handle) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        return 1;
+    }
+
+    // 获取动态库中的函数指针
+    hello = (HelloFunction)dlsym(handle, "hello_from_loader");   // 调用动态库里的哪个函数
+    if (!hello) {
+        fprintf(stderr, "Error: %s\n", dlerror());
+        dlclose(handle);
+        return 1;
+    }
+
+    // 调用动态库中的函数
+    (*hello)();
+
+    // 关闭动态库
+    dlclose(handle);
+
+    return 0;
+}
+
+dlopen函数：
+原型：void *dlopen(const char *filename, int flags);
+参数：
+filename：要打开的动态库文件的路径或名称。
+flags：指定打开方式的标志，例如 RTLD_LAZY 表示懒惰（延迟）绑定，即只有在使用函数时才解析符号。
+返回值：句柄；
+
+dlsym函数：
+原型：void *dlsym(void *handle, const char *symbol);
+参数：
+handle：是由 dlopen 返回的动态库句柄。
+symbol：是要获取地址的函数或变量的名称。
+返回值：从已打开的动态链接库中获取指定函数或变量（就是symbol）的地址（指针）。
+
+dclose函数：
+原型：int dlclose(void *handle);
+参数：
+句柄。
+返回值：成0败-1。
+
+对应Windows 上的动态加载函数是 LoadLibrary、GetProcAddress 和 FreeLibrary。

@@ -1,0 +1,2 @@
+相当于:
+	shutdown(sockfd, SHUT_RDWR);

