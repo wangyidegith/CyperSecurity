@@ -1,12 +1,108 @@
-1 初始化一个新的Git仓库：
-git init
+一 安装好了以后的两件事：
+（一）配置个人信息
+1 git config --global user.name "wy"
 
-2 添加远程GitHub仓库：
-git remote add <仓库的本地名，一般叫origin> <你的GitHub仓库URL>
+2 git config --global user.email wydegl@gmail.com
+	以上两条命令往往是刚刚安装好git后配置git的第一步。
+	关于--global：
+	default : 本地配置，只对本地仓库有效
+	--global : 全局配置，对所有仓库生效（一般使用这个）
+	--system : 系统配置，对所有用户生效
 
-3 添加文件并提交更改：
-git add .
-git commit -m "评论"
 
-4 推送到GitHub：
-git push -u <仓库的本地名，一般叫origin> master
+
+（二）配置GitHub的settings->SSH and GPG keys -> SSH keys -> New SSH key
+注：这是因为GitHub强制要求必须使用私钥登录，你git push一直输入密码你也烦啊。
+
+1 cd到.ssh目录，Linux在~/.ssh，Windows在C:\Users/<用户名>/.ssh
+
+2 ssh-keygen -t rsa -C "your_email@example.com"
+
+3 复制公钥到key。
+
+4 使用ssh -T git@github.com测试。
+
+
+
+
+
+
+
+二 初始化一个新的Git仓库：git init
+
+
+
+
+
+
+
+三 添加远程GitHub仓库：git remote add <仓库的本地名，一般叫origin> <你的GitHub仓库URL>
+git remote -v：查看远程仓库
+
+git remote remove <remote-name>
+
+
+
+
+
+
+
+三 添加修改文件（工作区到暂存区）：git add <文件>
+git status：查看文件的状态
+
+
+
+
+
+
+
+四 提交更改（暂存区到仓库）：git commit -m "评论"
+git ls-files：仅查看暂存区的状态
+
+git log：查看提交（commit）记录
+
+git rm -f
+	同时删除工作区和暂存区中的文件，等同于rm+git add
+
+git rm -f --cached
+	只删除暂存区中的文件
+
+
+
+
+
+
+
+五 创建分支：git branch -M <分支名，GitHub一般是main，为了后续书写简便，你也写成main>
+注：-M 是 --move --force 的缩写，表示强制重命名分支，即使目标分支名已存在也会覆盖。
+
+git branch
+	查看有哪些分支
+
+git branch 分支名称
+	创建分支
+
+git switch 分支名称
+	切换分支
+
+git merge 分支名称
+	将该分支合并到当前分支
+
+git branch -d 分支名称
+	只能删除已合并分支
+
+git branch -D 分支名称
+	强制删除未合并分支
+
+git branch -m 旧名 新名
+	给分支修改名称
+
+
+
+
+
+
+
+六 推送到GitHub：
+git push -u <GitHub仓库的本地名，一般叫origin> <远程分支名:本地分支名（两点：1 如果一样:及后面的可以省略 2 一般主分支叫master或者main）>
+注：-u：理解不了！

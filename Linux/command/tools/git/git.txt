@@ -79,7 +79,7 @@ git status
 git ls-files
 	查看tracked状态下的文件（也就是被git管理了的文件，就是暂存区中的文件内容）
 git log
-	查看提交记录
+	查看提交（commit）记录
 git rm -f
 	同时删除工作区和暂存区中的文件，等同于rm+git add
 git rm -f --cached

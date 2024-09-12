@@ -1,16 +1,28 @@
 一 安装
-apt install openssh-server
-sudo apt install openssh-client
+1 sudo apt install openssh-server
+
+2 sudo apt install openssh-client
 注：Ubuntu22版本往上自带sshd，sshc一般的Linux和Windows都自带。
-service ssh.service status
+
+3 sudo service ssh.service status
 查看是否安装成功。
 
 
 
+
+
+
+
 二 基本用法：ssh [-p <port>] 用户名@IPorDomain
-（一）注：
+（一）选项
 1 不写port默认22。
+
 2 @后面IP地址和域名皆可。
+
+3 -T：不开启伪终端，测试用。
+
+
+
 （二）通用格式：
 root@VM-12-15-ubuntu:/usr/src#
 wy@VM-12-15-ubuntu:/usr/src$
@@ -26,19 +38,32 @@ $代表处在普通用户权限下
 
 
 
+
+
+
+
 三 使用ssh制作隧道
-（1）正向代理
+（一）正向代理
 在proxy client上执行：ssh -L server-proxy-ip:server-proxy-port:dst-server-ip:dst-server-port -N -f -g -p proxy-server-port(22) proxy-server-user@proxy-server-ip
-（2）反向代理
+
+
+
+（二）反向代理
 在proxy client上执行：ssh -R server-proxy-ip:server-proxy-port:dst-server-ip:dst-server-port -N -F -g -p proxy-server-port(22) proxy-server-user@proxy-server-ip
 注：区别在于L和R的区别，在使用上，根本没有区别，但是用的人心里必须知道自己在使用正向代理还是反向代理，因为它们的用途是不一样的。
-（3）动态端口转发（不能反向）：
+
+
+
+（三）动态端口转发（不能反向）：
 ssh -D 在proxychains中配置的socks5代理 -N -f -g 远程服务器用户@远程服务器IP地址
 
 
 
-四 ssh的配置文件
-安装好ssh以后，系统上会出现两部分关于ssh的文件：
+
+
+
+
+四 ssh的配置文件：安装好ssh以后，系统上会出现两部分关于ssh的文件：
 （一）在/etc/ssh/下，
 1 这里主要是关于sshd的文件，包括：
 （1）moduli：moduli 文件包含了多个DH组的参数，每行一个组，每个DH组都包括一个质数（用于计算）和基础值（通常是2），这和算法底层有关，再议。
@@ -55,12 +80,16 @@ ClientAliveInterval 60
 ClientAliveCountMax 300
 e GatewayPorts yes：使得ssh隧道可以给非本地主机做端口转发。
 （4）sshd_config.d目录：你可以在这个目录下进行配置，后缀名一定要写成conf，sshd_config文件是包含这个目录下的所有.conf文件的。
+
 2 还有关于sshc的文件，包括：
 （1）ssh_config：
 a 就一个字段Host（远程主机），值为*，然后下面包含很多子字段（下属字段）。
 b Host字段用来定义ssh连接的远程主机名，下属字段用来定义相关信息（比如端口号，IP或者域名、私钥登录时需要用到的私钥文件的路径等），在私钥登录中你就会看到Host字段的用法。
 c 事实上，我们一般不在这个文件里配置某个远程主机的信息，而仅配置Host *，也就是全局配置，那么我们在哪里配置某个远程主机呢？在~/.ssh目录下的config文件中，第二部分会详解该目录。
 （2）ssh_config.d：你可以在这个目录下进行配置，后缀名一定要写成conf，ssh_config文件是包含这个目录下的所有.conf文件的。
+
+
+
 （二）在~/.ssh/下，这个目录是专门关于sshc的目录：
 1 known_hosts：连接过的sshd的公钥。
 sshc第一次连某个sshd时，会显示（这是第二次握手过来了）：
@@ -76,8 +105,11 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])?
 （1）sshc不是像HTTPS那样把第二次握手拿到的公钥对保存的证书进行验签而是和自己保存的公钥进行比对，但是二者完全一个道理，都是为了防御中间人攻击，证书的核心本身也是公钥啊，因而不要在意这个问题。
 （2）在第三次握手中保护prematser secret的传递。
 那么如果sshd重装了或者换了私钥，再次登录sshd时会显示：WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!，这是因为sshc还在使用旧公钥验证，自然对不上，所以导致sshc怀疑遭遇了中间人攻击，你只需要把known_hosts关于该sshd的内容清空了再从头开始就行了。
+
 2 authorized_keys：使用私钥登录的sshc的公钥。
+
 3 id_rsa, id_rsa.pub：sshc的公私钥对，当然也可能包含其他算法的（这取决于你在ssh-keygen的时候-t的谁）
+
 4 config：配置要连接的sshd的信息Host字段用来定义ssh连接的远程主机名，下属字段用来定义相关信息（比如端口号，IP或者域名、私钥登录时需要用到的私钥文件的路径等），格式请看下面例子：
 Host test
 	HostName 192.168.43.171
@@ -88,17 +120,27 @@ Host test
 
 
 
+
+
+
+
 五 私钥登录
 （一）优点：避免被暴力破解；缺点：不方便。
+
+
+
 （二）实现过程（以下操作全部都在客户端进行）：
 1 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 生成公私钥对，公钥保存在~/.ssh/id_rsa.pub文件中，私钥保存在~/.ssh/id_rsa文件。
+
 2 ssh-copy-id username@remote_host
 在本地将本地生成的公钥添加到remote_host的~/.ssh/authorized_keys中，这个过程可以手动但是使用ssh-copy-id命令更方便，执行该命令会要求输入username的密码，因而该方法的前提是PasswordAuthentication开着，完事再关掉PasswordAuthentication。
+
 3 在.ssh下新建一个文件config，输入以下内容：
 Host 自定义实例名
 	HostName 目标机域名或IP地址
 	User 目标机用户名
 	Port 目标机ssh端口
 	IdentityFile ~/.ssh/id_rsa
+
 4 使用 ssh 自定义实例名 实现无密码登录。
