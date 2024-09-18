@@ -93,24 +93,22 @@ int main() {
     return 0;
 }
 
-dlopen函数：
+dlopen函数（LoadLibrary）：
 原型：void *dlopen(const char *filename, int flags);
 参数：
 filename：要打开的动态库文件的路径或名称。
 flags：指定打开方式的标志，例如 RTLD_LAZY 表示懒惰（延迟）绑定，即只有在使用函数时才解析符号。
 返回值：句柄；
 
-dlsym函数：
+dlsym函数（GetProcAddress）：
 原型：void *dlsym(void *handle, const char *symbol);
 参数：
 handle：是由 dlopen 返回的动态库句柄。
 symbol：是要获取地址的函数或变量的名称。
 返回值：从已打开的动态链接库中获取指定函数或变量（就是symbol）的地址（指针）。
 
-dclose函数：
+dclose函数（FreeLibrary）：
 原型：int dlclose(void *handle);
 参数：
 句柄。
 返回值：成0败-1。
-
-对应Windows 上的动态加载函数是 LoadLibrary、GetProcAddress 和 FreeLibrary。

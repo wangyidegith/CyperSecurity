@@ -140,16 +140,28 @@ LDAP注入
 
 
 
-（二）攻击程序（exp） = 远控 + 后门（web安全的payload很多时候不需要远控 + 后门，是后面需要，二进制安全的基本上直接就是远控 + 后门）
+（二）攻击程序（exp） = 远控 + 后门
+0 一些问题：有很多现成的rat和backdoor，不用我们真的去设计，比如meterpreter和msfvenom制出来的毒、emp3r0r和它生成的agent、蚁剑和一句话木马等。
+
+思路：
+
 1 三对渗透测试著名概念辨析：
-（1）backdoor（后门）和rat（Remote Access Tool，远控工具）：指程序
-（2）target（受害主机）和cc（c2，command and control，c2服务器，攻击机）：指机器
+（1）backdoor（后门）和rat（Remote Access Tool，远控工具）：指程序。
+（2）target（受害主机）和cc（c2，command and control，c2服务器，攻击机）：指机器。
 （3）被控端和控制端：既指程序也指机器，这是通俗叫法。
 
-2 backdoor的概念：
-（1）backdoor又称木马Trojan Horse、病毒virus（其实木马和病毒是更宽泛的概念）。
-（2）一种分类：分为大马和小马，小马负责通信（小马就是最基本的后门 == 网络 + 拿shell），大马就是APT的马。
-（3）后门的分类（深入理解后门）：在msf中我们分析了payload的类型：
+2 backdoor的别称（木马、病毒、payload、shellcode）：
+（1）木马（Trojan Horse）：严格来看，中毒的正常文件才能被叫做木马，但是很多时候也把毒叫做木马，这个你注意一下就行别别人说什么不知道。
+一种分类：分为大马和小马，小马负责通信（小马就是最基本的后门 == 网络 + 拿shell），大马就是APT的马。
+（2）病毒（virus）：病毒其实更指那些具有传染性的后门程序，当然任何恶意程序都可以都叫做病毒。
+（3）payload：汉语叫有效载荷，本义指协议包里的协议体即用户数据部分，在这里类比指实际用于攻击的代码。
+其实不用去纠结到底谁是payload，后门就是payload。
+（4）在二进制安全中，backdoor即大名鼎鼎的shellcode。
+即使用-f raw得到的二进制代码。
+是一段小型的、通常用汇编语言编写的代码。
+名称由来：后门最基本的功能就是拿shell，这正是shellcode的名称由来，但是事实上shellcode能做的事多了。
+
+3 后门的类型（深入理解后门）：在msf中我们分析了payload的类型：
 
 =======
 1 payload的一二级模块：
@@ -164,18 +176,12 @@ LDAP注入
 =======
 
 根据以上分析，可以看出，后门是分六种的，不同系统不同架构不同rat还分正向和反向，但是除了这四种，剩下的两种其实是小马也就是最基本后门的两个功能（网络 + 拿shell，以拿shell这个最基本的功能来代指所有的payload）的分类：
-a 后门可分为inline和stager，这对应了后门的加载模式即怎么去拿shell。
+a 后门可分为inline和stager，这对应了后门对于核心payload的加载模式。
 这里首先弄清楚一个概念：后门程序包括两个部分：一是加载器，二是payload（去拿shell的代码），加载器要去运行payload。
 inline是文件马，即加载器和payload都被放到了target上，运行后加载器再加载payload。
 stager是内存马，即先送上去一个stager（引导器），这个引导器只负责网络功能，然后再陆续接收payload，拿到payload后payload不落盘直接在内存里运行。
 b 后门可分为tcp、http、https、tls等（甚至可以udp），这对应了后门的网络功能。
 事实上可以看到：stager和回连协议已经在初步考虑免杀和流量伪装了。
-
-3 payload的概念：
-（1）汉语叫有效载荷，本义指协议包里的协议体即用户数据部分，在这里类比指实际用于攻击的代码。
-（2）在二进制安全中，即大名鼎鼎的shellcode，即使用-f raw得到的二进制代码。
-
-4 有很多现成的rat和backdoor，不用我们真的去设计，比如meterpreter和msfvenom制出来的毒、emp3r0r和它生成的agent、蚁剑和一句话木马等。
 
 
 

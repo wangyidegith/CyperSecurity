@@ -1,5 +1,5 @@
-该文仅在介绍思路和一些基本工具，事实上思路就是从域名开始之后就是资产和指纹，没啥可说的。
-明确思路后重点在于如何使用一些综合性的工具，比如该文介绍的ARL就是一款综合性渗透工具。
+该文讲web信息收集的思路，就是以域名为原点，资产->指纹。
+
 
 
 
@@ -49,7 +49,6 @@ c 访问：https://IP:5003/
 3 subfinder：https://github.com/projectdiscovery/subfinder
 
 4 OneForAll：https://github.com/shmilylty/OneForAll
-暂时不用
 
 
 
@@ -118,6 +117,9 @@ https://c.webscan.cc/
 
 
 总的来看有三大样：
-工具：目前三个工具没有弄：httpx、ehole、subfinder，目前弄起来的工具有IISPutScanner、layer。
-网站：详见hack.html
-浏览器插件：尤其是指纹信息搜集插件。
+工具（最差）：目前三个工具没有弄：httpx、ehole、subfinder，目前弄起来的工具有IISPutScanner、layer。
+网站（其次）：详见hack.html
+浏览器插件（最好）：尤其是指纹信息搜集插件。
+
+exp工具：
+web：bp sqlmap dirmap wfuzz xray awvs，除了bp都没弄。
