@@ -26,7 +26,7 @@
 
 4 proxy :
     如何使用nc设置一台proxy server？nc -s "listen_ip" -lvp "listen_port" | nc "listen_ip" "listen_port"
-    nc客户端如何使用代理proxy？nc -x <proxy_host>:<proxy_port> <destination_host> <destination_port>
+    不能使用代理，请使用ncat。
 
 5 shell :
 （1）靠谱：

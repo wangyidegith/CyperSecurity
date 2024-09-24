@@ -1,0 +1,254 @@
+零 基本认识
+0 下载地址：https://github.com/trustedsec/social-engineer-toolkit
+
+1 安装：需要python3
+
+2 启动：setoolkit
+
+3 
+返回上一级：99
+返回最开始：CTRL + c
+退出：CRT了 + d
+
+4 删除键：CTRL + backspace
+
+5 配置文件set_config在哪？
+/etc/setoolkit
+
+6 程序在哪？
+/usr/local/share/setookit
+
+
+
+
+
+
+
+一 一级模块（你至少应该想到五种社工思路：邮件、web、USB、二维码（结合web）、WiFi，加上移动端，你至少应该再想到短信和NFC）
+（一）Social-Engineering Attacks   // 最核心的一级模块：社工攻击模块。这是set用于进行攻击的模块，包含了所有的攻击向量（vector在网络攻击中其实就是攻击方法的意思，也可以说成是攻击的途径、手段、思路等等）。
+下面简介其攻击向量模块：
+1 Spear-Phishing Attack Vectors
+（0）Spear-Phishing，汉语叫鱼叉式钓鱼，其实钓鱼就是用诱饵，不管怎么社工都是钓鱼即都是用诱饵，鱼叉式强调目标的针对性。
+（1）具体的攻击方式：
+a Perform a Mass Email Attack
+b Create a FileFormat Payload：和a一样。
+c Create a Social-Engineering Template：不能叫攻击方式了，只创建邮件模板。
+
+2 Website Attack Vectors
+
+
+3 Infectious Media Generator
+（1）原理：感染性USB/CD/DVD模块将创建一个 autorun.inf 文件和一个 Metasploit 有效载荷。
+（2）攻击：当插入DVD/USB/CD时，如果启用了自动运行，它将自动运行。
+（3）防御：Windows7以后的很多系统都开起了禁用自动运行（autorun disabled）或端点保护（endpoint protection）。
+
+4 Create a Payload and Listener：mini msf wrapper
+
+5 Mass Mailer Attack：这是撒网式钓鱼。
+
+6 Arduino-Based Attack Vector：传统的弹簧刀容易被禁用自动运行获端点保护防御下来，但是普遍使用的计算机不可能对键盘这种USB设备做出限制，于是一类伪装（指在驱动中注册为键盘，外观还是普通U盘）成键盘arduino弹簧刀就此诞生。
+如何制作arduino弹簧刀：
+（1）首先你需要买一个arduino。
+（2）使用set的Arduino-Based Attack Vector生成攻击代码。
+（3）将攻击代码注入到Arduino里。
+
+7 Wireless Access Point Attack Vector
+就是继承了aircrack-ng，近源渗透也是社工。
+
+8 QRCode Generator Attack Vector
+生成某个url的二维码，ip138有类似功能。
+
+9 Powershell Attack Vectors
+PowerShell为部署有效载荷和执行不被防护技术触发的功能提供了丰富的环境。
+
+10 Third Party Modules
+
+
+
+
+（二）Penetration Testing (Fast-Track)   // 快速渗透
+
+
+
+（三）Third Party Modules   // 第三方模块
+
+
+
+（四）Update the Social-Engineer Toolkit   // 更新set
+
+
+
+（五）Update SET configuration   // 更新配置
+
+
+
+（六）Help, Credits, and About   // 帮助
+
+
+
+
+
+
+
+二 鱼叉式钓鱼
+（零）攻击方式：
+1 Perform a Mass Email Attack
+
+2 Create a FileFormat Payload：和1一样。
+
+3 Create a Social-Engineering Template：不能叫攻击方式了，只创建邮件模板。
+问题：再创建body的过程中发生了，ERROR:local variable 'body' referenced before assignment。
+
+
+
+（一）Perform a Mass Email Attack（1、2、13、15、17是不通过漏洞的）：
+*1 SET Custom Written DLL Hijacking Attack Vector (RAR, ZIP)
+利用DLL劫持，攻击者诱使用户下载并运行一个包含恶意DLL的压缩文件（如RAR或ZIP），从而执行恶意代码。
+
+*2 SET Custom Written Document UNC LM SMB Capture Attack
+通过创建包含UNC路径的文档，诱导用户打开该文档，从而捕获其SMB凭证。
+
+3 MS15-100 Microsoft Windows Media Center MCL Vulnerability
+利用Windows Media Center中的MCL文件处理漏洞，攻击者可以诱导用户打开特制的MCL文件，从而执行任意代码。
+
+4 MS14-017 Microsoft Word RTF Object Confusion (2014-04-01)
+通过创建特制的RTF文档，利用Word中的对象混淆漏洞，攻击者可以执行恶意代码。
+
+5 Microsoft Windows CreateSizedDIBSECTION Stack Buffer Overflow
+利用Windows图形处理中的堆栈缓冲区溢出漏洞，攻击者可以通过特制的图像文件执行恶意代码。
+
+6 Microsoft Word RTF pFragments Stack Buffer Overflow (MS10-087)
+通过特制的RTF文件，攻击者可以触发Word中的缓冲区溢出，执行任意代码。
+
+7 Adobe Flash Player "Button" Remote Code Execution
+利用Flash Player中的“按钮”漏洞，攻击者可以通过恶意Flash内容执行任意代码。
+
+8 Adobe CoolType SING Table "uniqueName" Overflow
+利用CoolType中的溢出漏洞，攻击者可以通过特制的字体文件执行恶意代码。
+
+9 Adobe Flash Player "newfunction" Invalid Pointer Use
+利用Flash中的指针使用漏洞，攻击者可以执行恶意代码，可能导致内存损坏。
+
+10 Adobe Collab.collectEmailInfo Buffer Overflow
+通过特制的Adobe文档，攻击者利用缓冲区溢出漏洞获取敏感信息或执行代码。
+
+11 Adobe Collab.getIcon Buffer Overflow
+利用Adobe文档中的缓冲区溢出，攻击者可以执行恶意代码。
+
+12 Adobe JBIG2Decode Memory Corruption Exploit
+利用JBIG2解码过程中的内存损坏，攻击者可以执行任意代码。
+
+*13 Adobe PDF Embedded EXE Social Engineering
+在Adobe PDF文档中嵌入EXE文件，利用社会工程学诱导用户执行恶意代码。
+
+14 Adobe util.printf() Buffer Overflow
+利用Adobe工具中的缓冲区溢出漏洞执行任意代码。
+
+*15 Custom EXE to VBA (sent via RAR)
+将恶意EXE文件转换为VBA脚本，通过RAR文件发送给用户，诱导执行。
+
+16 Adobe U3D CLODProgressiveMeshDeclaration Array Overrun
+利用U3D格式中的数组越界漏洞，攻击者可以执行恶意代码。
+
+*17 Adobe PDF Embedded EXE Social Engineering (NOJS)
+与第13点类似，但不依赖JavaScript，直接嵌入EXE，诱导用户执行。
+
+18 Foxit PDF Reader v4.1.1 Title Stack Buffer Overflow
+利用Foxit PDF Reader中的缓冲区溢出漏洞，攻击者可以执行任意代码。
+
+19 Apple QuickTime PICT PnSize Buffer Overflow
+利用QuickTime中的缓冲区溢出漏洞，通过特制的PICT文件执行代码。
+
+20 Nuance PDF Reader v6.0 Launch Stack Buffer Overflow
+利用Nuance PDF Reader中的缓冲区溢出漏洞，攻击者可以执行恶意代码。
+
+21 Adobe Reader u3D Memory Corruption Vulnerability
+利用Adobe Reader中的内存损坏漏洞，攻击者可以执行任意代码。
+
+22 MSCOMCTL ActiveX Buffer Overflow (ms12-027)
+利用ActiveX控件中的缓冲区溢出漏洞，攻击者可以通过特制的网页执行恶意代码。
+
+
+
+（二）1 利用DLL劫持，攻击者诱使用户下载并运行一个包含恶意DLL的压缩文件（如RAR或ZIP），从而执行恶意代码。
+1 原理：本质上时动态库注入。
+
+2 目前可以注入以下程序（这个功能我感觉很扯，因为这些程序都是些不太容易被使用或过时的程序）：
+    1. Windows Address Book (Universal)
+    2. Microsoft Help and Support Center
+    3. wscript.exe (XP)
+    4. Microsoft Office PowerPoint 2007
+    5. Microsoft Group Converter
+    6. Safari v5.0.1
+    7. Firefox <= 3.6.8
+    8. Microsoft PowerPoint 2010
+    9. Microsoft PowerPoint 2007
+    10. Microsoft Visio 2010
+    11. Microsoft Word 2007
+    12. Microsoft Powerpoint 2007
+    13. Microsoft Windows Media Encoder 9
+    14. Windows 7 and Vista Backup Utility
+    15. EnCase
+    16. IBM Rational License Key Administrator
+    17. Microsoft RDP
+
+
+
+
+（三）13 在Adobe PDF文档中嵌入EXE文件，利用社会工程学诱导用户执行恶意代码。
+0 注意是adobe，不是wps啊，wps的pdf并不支持JavaScript宏（set对中国用户太他妈不友好了，难怪在中国不流行）。
+
+1 目前的问题：gmail确实发了邮件，但是向与原始定义不符的邮箱地址发送，也许需要使用邮件传输代理解决该问题。
+
+
+
+（四）15 将恶意EXE文件转换为VBA脚本，通过RAR文件发送给用户，诱导执行。
+目前的问题：在生成payload时报错（kali的set可报此错）：Something went wrong, printing the error: name 'a' is not defined，怀疑是python版本与set不兼容。
+
+
+
+
+
+
+三 web钓鱼（会谈到二维码但二维码是针对于移动端的而web钓鱼的payload没有apk或ipa啊）
+（零）攻击方式：
+1 Java Applet攻击方法将伪造Java证书并交付基于Metasploit的payload。使用由Thomas Werth创建的定制Java小程序来交付payload。
+问题：测试未通过，payload的tcp、http、https及各种浏览器都试过就是不行。
+猜测原因：
+首先直观来看拿不到钓鱼网站的页面只显示空白，而cc这边报一堆莫名其妙的错误。
+其次netstat 80发现tcp        0      0 38.6.221.47:80          223.104.153.209:16390   TIME_WAIT，说明浏览器是有访问cc的HTTP钓鱼网站的，但是却拿不到任何信息，这说明是cc这边的问题，估计是代码层面的问题。
+测试过程中发现了一些有趣的事情：
+（1）当你访问某个监听器时，会重定向到一个显示为”It works!“的页面，这是远控的一个重要功能。
+（2）Java Applet攻击向量不需要其他的HTTP服务器而是自己在80开启一台HTTP服务器，因而如果开了apache2、nginx等HTTP服务，请关闭它。
+
+2 Metasploit浏览器漏洞方法将通过iframe利用选择的Metasploit浏览器漏洞，交付Metasploit payload。
+未测试。
+这个方法相当于msf的aurora模块。
+
+3 凭证收集器方法将克隆一个具有用户名和密码字段的网站，以收集所有提交到该网站的信息。
+这个要注意在clone时要clone那些有表单提交的网址比如https://vip.biancheng.net/login.php，如果没有那也可以自己魔改一个表单出来。
+
+4 TabNabbing方法将等待用户切换到不同的标签，然后刷新页面为其他内容。
+问题：测试未通过，我还不理解如何使用。
+
+5 Web-Jacking攻击方法由white_sheep和emgent引入。该方法利用iframe替换使高亮URL链接看起来合法，但在点击时弹出窗口，然后被恶意链接替换。您可以在set_config中编辑链接替换设置，如果速度太慢/太快。
+相比于3，多了一步跳转，这是有意义的，因为用户可能不会直接信任某个突然出现的页面但是大多会新人经某个页面跳转的页面。
+3、5这种凭证搜集类型的攻击向量是需要一台第三方HTTP服务器的（经测试set使用的是apache2）。
+问题：如何指定域名？如何使用https而非80？
+
+6 多重攻击方法将通过网络攻击菜单添加组合攻击。例如，您可以同时利用Java Applet、Metasploit浏览器、凭证收集器/Tabnabbing等，以查看哪种攻击成功。
+未测试。
+
+7 HTA攻击方法将允许您克隆一个网站，并通过HTA文件执行PowerShell注入，这可以用于通过浏览器进行基于Windows的PowerShell利用。
+当用户访问钓鱼网站时自动下载一个hta（HTML Application，一种由HTML和JavaScript或vbscript写成的脚本程序，尽可以在Windows平台运行）文件，
+这种文件我在cs里见过，可以作为pe文件的替代版，
+当你运行后会启用一个pwershell.exe进程（这一定程度上做到了进程隐藏），此时可以删除源文件也不会影响回连（做到了内存马），且断连后可以回连（做到了持久化，但是重启后能否回连还未测试）。
+
+
+
+（一）每个方式基本上都提供了三种创建钓鱼网站的方法
+1 导入预定义：将允许SET导入预定义的网络应用程序列表，以便在攻击中使用。
+
+2 clone（这是最主要的方法）：将完全克隆您选择的网站，并允许您在完全相同的网络应用程序中利用攻击向量。
+
+3 自定义（感觉没啥意义，因为就算是自定义的网站也可以clone啊）：允许您导入自己的网站，请注意，在使用导入网站功能时，您应仅包含一个index.html文件。

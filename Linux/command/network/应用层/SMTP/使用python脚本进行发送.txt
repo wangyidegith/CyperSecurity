@@ -1,0 +1,35 @@
+/* 目前测试不成功，原因可能在于：谷歌、微软、腾讯等主流厂商一般禁止用户使用非授权客户端进行登录。
+*/
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# 邮件发送者和接收者
+sender_email = "wydems@outlook.com"
+receiver_email = "wydems@outlook.com"
+password = "132013wyOk"
+
+# 创建邮件内容
+subject = "Test Email"
+body = "This is a test email sent from Python."
+
+# 设置MIME
+msg = MIMEMultipart()
+msg['From'] = sender_email
+msg['To'] = receiver_email
+msg['Subject'] = subject
+
+# 添加邮件正文
+msg.attach(MIMEText(body, 'plain'))
+
+# 发送邮件
+try:
+    # 连接到SMTP服务器
+    with smtplib.SMTP('smtp.office365.com', 587) as server:  # 替换为你的SMTP服务器
+        server.starttls()  # 启用TLS加密
+        server.login(sender_email, password)  # 登录
+        server.send_message(msg)  # 发送邮件
+    print("邮件发送成功")
+except Exception as e:
+    print(f"邮件发送失败: {e}")

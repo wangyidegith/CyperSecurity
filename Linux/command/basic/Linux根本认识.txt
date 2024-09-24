@@ -15,7 +15,7 @@
 什么计算机都是有shell的，
 安卓手机、各种物联网设备也有啊，
 我们一般通过USB连接安卓手机，
-在电脑上使用一个叫ADB（Android Debug Bridge）的程序与安卓手机交互，你下载好了以后，配置一下PATH，就可以在命令行使用adb了，首先adb version测试下好了没，再adb devices查看安卓设备，
+在电脑上使用一个叫ADB（Android Debug Bridge）的程序与安卓手机交互，你下载好了以后，配置一下PATH，就可以在命令行使用adb了，首先adb version测试下好了没，再adb devices查看安卓设备，使用adb kill-server停止，
 然后我们具体可以做这些事：1 获得安卓机shell，命令：adb shell；2 做端口映射；3 文件传输；4 安装APK（Android Package），命令：adb install <apk path>,
 我们当然也可以使用ssh登录安卓手机，但前提是你得在安卓机上安装sshd，具体操作步骤是：1 在安卓机上装一个Termux（获取安卓shell的一个软件，但是它拿不到root）；2 打开Termux，执行命令：apt update和apt install openssh；3 sshd启动openssh服务，Termux会开启一个8022端口（一般是，如果不是也可以用nmap扫）；4 修改密码：whoami得到用户名然后passwd改密码；5 ip a拿到安卓机IP地址，ssh 用户名@安卓机IP地址 -p 8022，登录了，
 现在的问题是我还不知道怎么拿智能终端的root权限（越狱）。

