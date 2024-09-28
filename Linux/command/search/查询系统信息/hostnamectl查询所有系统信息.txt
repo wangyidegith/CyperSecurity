@@ -1,3 +1,5 @@
+== Windows下的systeminfo
+
 hostnamectl
 信息如下：
  Static hostname: hkyn2mxj1VsKKGM

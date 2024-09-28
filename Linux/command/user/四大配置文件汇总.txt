@@ -1,0 +1,67 @@
+一 passwd文件（用户信息配置文件）：root:x:0:0:root:/root:/bin/bash
+username
+
+password：x表示密码在/etc/shadow文件中以加密方式保存
+
+UID
+
+GID
+
+description
+
+master dir：在创建时如无特殊指定，家目录会在/home目录下，也可以将该项指定为/nonexistent，表示指定没有家目录
+
+用户命令解释器：指定为/bin/bash或/bin/sh等解释器，代表这是一个普通用户，指定为/usr/sbin/nologin或/bin/false，代表这是一个systemd用户
+
+
+
+
+
+
+
+二 shadow（包含用户密码的哈希值）：username:encrypted_password:last_change:min:max:warn:inactive:expire:
+username: 用户名。
+
+encrypted_password: 加密后的密码，若为 ! 或 *，表示该账户被锁定。
+
+last_change: 上次修改密码的日期（以天数为单位，从 1970 年 1 月 1 日开始）。
+
+min: 密码最小使用天数，用户在此期间不能更改密码。
+
+max: 密码最大使用天数，到期后需要更改密码。
+
+warn: 在密码到期前多少天开始提醒用户更改密码。
+
+inactive: 密码到期后多少天账户将变为非活动状态。
+
+expire: 账户的过期日期。
+
+
+
+
+
+
+
+三 group（组信息配置文件）：group_name:password:GID:user_list
+group_name: 用户组的名称。
+
+password: 用户组的密码，通常不使用，因此常为 x 或空。
+
+GID: 组 ID (Group ID)，每个用户组都有一个唯一的标识符。
+
+user_list: 属于该组的用户列表，用户之间用逗号分隔。
+
+
+
+
+
+
+
+四 sudoers（用户权限配置文件）：username    hosts=(users:groups) cmds
+hosts：username可以在哪些host上获得该用户的权限。
+
+users：username可以在以哪些用户的身份执行命令。这个有点难理解，其实就是：其实Linux下一切皆文件，权限就是看文件的ugo权限，那么假设一个名为wy的用户有一个文件的权限是：-rw-r-r，那么root显然是其他人啊，但是root也能改它执行它，因为root的users选项被配置为了ALL，意味着root可以获得任何用户的权限。
+
+groups：和users一个道理。
+
+cmds：username可以执行的sudo命令。

@@ -1,7 +1,0 @@
-id 用户名
-
-示例：
-id www-data
-uid=33(www-data) gid=33(www-data) groups=33(www-data),1000(wyal)
-解释：
-uid是用户id，gid是主组id，groups是这个用户属于所有的组的id和组名信息。

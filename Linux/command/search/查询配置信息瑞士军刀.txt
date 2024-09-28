@@ -1,0 +1,10 @@
+getent
+1 功能：该命令主要应用于查询配置信息，
+
+2 用法：getent <etc-name> [item]
+getent etc-name == cat /etc/etc-name
+getent etc-name item == grep item /etc/etc-name
+
+3 例子：
+（1）查所有用户组：getent group == cat /etc/group
+（2）查某个用户组的所有用户：getent group <group-name> == grep <group-name> /etc/group

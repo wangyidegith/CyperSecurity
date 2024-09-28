@@ -1,0 +1,1 @@
+getent group <group_name>

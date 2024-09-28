@@ -1,0 +1,56 @@
+uname
+
+
+
+
+
+
+
+查所有系统信息（和hostnamectl差不太多）：uname -a
+
+
+
+
+
+
+
+查询内核或者说平台（OS）：
+查询内核类型：
+uname -o
+
+查内核名：uname -s == uname
+一般就是叫Linux、Windows，和内核的类型保持一致。
+
+查内核的发行版本（查系统发行版是：lsb_release -r）：
+uname -r
+
+查内核的构建信息：
+uname -v
+下面是一个实例：
+uname -v
+#31-Ubuntu SMP Thu May 5 10:00:34 UTC 2022
+对该实例的解释：
+#31-Ubuntu：这是内核的构建编号，通常指示特定的版本或发行版。
+SMP：表示支持对称多处理（Symmetric MultiProcessing），意味着该内核能够在多核处理器上运行。
+Thu May 5 10:00:34 UTC 2022：这是内核构建的日期和时间，表示这个内核是在2022年5月5日10:00:34 UTC构建的
+
+
+
+
+
+
+
+查询架构：
+查架构名：uname -m
+
+查架构类型：
+uname -p
+uname -i
+
+
+
+
+
+
+
+查网络主机名（就是主机名，== hostname）：uname -n

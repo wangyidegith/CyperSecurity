@@ -82,23 +82,27 @@ exit（quit）
 
 四 MSF的基本命令
 1 search 模块名
-查询一个模块的路径
+（1）基本功能：查询一个模块的路径。
+（2）支持模糊查询：可以查询任何一个节点，不一定非得是叶子节点即完整路径，也不用非得顺着路径。
 
 2 info 模块的路径
 查看一个模块的信息，可以看到很多信息：（1）模块名全称；（2）模块路径；（3）适用的操作系统；（4）权限信息：BSD开源许可证；（5）对该漏洞的评级：excellent最高，其次great，最低manual（需调试）；（6）适用的操作系统版本；（7）基本选项；（8）帮助用户选定合适的payload；（9）对该漏洞的详细介绍；（10）该漏洞在网络漏洞数据库的URL。
 
 3 use 模块路径
-选中某个模块
+（1）和search完全一样。
+（2）选中某个模块。
 
 4 show：
 （1）show：得到十大一级模块：encoders, nops, exploits, payloads, auxiliary, post, plugins, info, options, favorites
 （2）show 一级模块
-注：info和options得use到某个模块，这时候 show info == info
+（3）show options
+（4）show advanced
+注：use到某个模块，这时候 show info == info
 
 5 set 选项 值
 设置
 
-6 expoit（run的意思）
+6 expoit
 用在两类模块里：expoit和payload。
 
 
@@ -107,7 +111,7 @@ exit（quit）
 
 
 
-五 使用msf exploit的一般过程（RAT一般的操作思路就是：use->set->run，中间不知道就show一下）
+五 使用msf exploit的一般过程（RAT一般的操作思路就是：use->set->run（msf没有run这个命令，run是meterpreter的命令），中间不知道就show一下）
 1 use 漏洞所对应的exploit模块；
 比如：use exploit
 

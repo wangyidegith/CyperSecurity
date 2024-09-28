@@ -1,0 +1,76 @@
+一 安装nfs服务器
+1 sudo apt update
+
+2 sudo apt install nfs-kernel-server
+
+
+
+
+
+
+
+二 创建和配置共享目录
+1 创建目录
+sudo mkdir -p 共享目录
+
+2 配置（只得配置为nobody，因为共享目录是要让很多不同的用户访问的，777有待另行考虑）
+sudo chown nobody:nogroup 共享目录
+sudo chmod 777 共享目录
+
+
+
+
+
+
+
+三 配置以使共享目录可以共享
+0 sudo vim /etc/exports
+
+1 共享目录 [limit-ips](option1,option2,...)
+比如：nfs_share 192.68.43.0/24(rw,sync,no_subtree_check)
+（0）limit-ips
+可以是单独ip，也可以是192.168.43.0/24这种形式，*代表任意主机。
+有如下option：
+（1）sec options：格式为：sec=below
+sys：使用系统用户认证。
+krb5：使用 Kerberos 5 进行身份验证。
+krb5i：使用 Kerberos 5 进行身份验证，并提供数据完整性保护。
+krb5p：使用 Kerberos 5 进行身份验证，并提供数据隐私保护。
+另外还包括网段限制。
+（2）rw（ro是只读）:
+允许读写访问，即客户端可以读取和修改共享目录中的文件。
+（3）sync（async自然相反）:
+确保所有写操作在返回确认之前都已被写入到存储设备中。这有助于保证数据的一致性和完整性。
+（4）fsid=0:
+指定文件系统标识符，通常用于主文件系统。给定fsid=0标识该目录为根导出。
+（5）crossmnt:
+允许跨越挂载点的访问。这意味着如果有其他的NFS挂载在该共享目录下，客户端仍然能够访问这些子目录。
+（6）no_subtree_check:
+禁用子目录检查。这意味着当客户端请求访问共享的子目录时，NFS 不会检查这个子目录是否在导出路径下。这样可以提高性能，尤其是在大型文件系统中。
+
+
+
+
+
+
+
+四 使配置文件生效（又称导出）：sudo exportfs -ra
+1 r: 重新导出所有共享的文件系统。这会将 /etc/exports 文件中的更改应用到当前的共享。
+
+2 a: 表示所有（all），即对于所有在 /etc/exports 中定义的共享都进行重新导出。
+
+
+
+
+
+
+
+五 重启nfs：sudo systemctl restart nfs-kernel-server
+
+
+
+
+
+
+
+六（可选） 防火墙设置：sudo ufw allow from <limit-ips> to any port nfs

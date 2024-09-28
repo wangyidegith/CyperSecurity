@@ -1,0 +1,221 @@
+零 概念
+0 一个容器就是一个专门给某个程序搞的虚拟机。
+
+1 两个核心概念（程序和进程的关系）：
+（1）镜像：会有一个dockerfile来部署镜像。
+（2）容器：轻量、独立（自包含）、可执行的一个实体。
+
+2 除了镜像和容器外的其他组件：
+（1）docker hub：公共镜像库，可上传可下载。
+（2）docker compose：管理多docker，通过一个docker-compose.yml的配置文件进行管理。
+
+3 特点：开源、轻量
+
+4 微服务的基础技术。
+
+5 注意：下面所有的image_name或者镜像名之类的关于镜像名称的称谓的实际形式是：REPOSITORY:TAG，也可以用ID代替REPOSITORY:TAG，如果你不强调版本（TAG），默认LATEST。
+
+
+
+
+
+
+
+二 关于镜像和容器的基本操作
+（一）镜像
+1 列出所有镜像
+docker images
+
+2 从docker hub拉取镜像
+docker pull <image_name>
+
+3 根据dockerfile构建镜像（构建镜像必须得有dockerfile）
+docker build -t <image_name>:<tag> <path>
+
+4 删除镜像
+docker rmi <image_name>
+
+5 强制删除正在运行的镜像
+docker rmi -f image_name>
+
+6 查看镜像信息
+docker inspect <image_name>
+
+7 给镜像打标签（更新版本，标签说白了就是版本号）
+docker tag <old image:tag> <new image:tag>
+
+8 从tar文件导入镜像
+docker load -i <file_name>.tar
+
+9 导出镜像为tar文件
+docker save -o <file_name>.tar <image_name>
+
+
+
+（二）容器
+1 创建容器（容器必须从镜像来）
+docker run -d --name self-define-container-name image-name
+注：以下简称container。
+（0）基本格式：docker run 选项 镜像名 命令 
+如果你在这里指定命令会覆盖dockerfile的CMD。 
+（1）-d，--detach
+在后台运行容器。
+（2）--name
+为容器指定一个名称。
+（3）-p，--publish
+将宿主机的端口映射到容器端口。
+用法：docker run -p 宿主机端口:容器端口 镜像名
+关于docker的端口映射：
+a docker ps看到0.0.0.0:5003->80/tcp：意思是说：外部的5003映射到内部的80端口。
+b 在docker-compose.yml文件里看到的 - "8080:80" 意味着：外部的8080映射到内部的80端口。
+（4）-v，--volume
+挂载宿主机的某个目录到容器中。
+理解：你在docker容器里头是一个独立运行的虚拟环境，但是你可以将实际主机的某个目录映射到容器内，在容器访问该目录就是在访问实际目录。
+用法：docker run -v 宿主机目录:容器目录 镜像名
+注：容器目录可以被覆盖，比如：docker run -v /ect:/etc <image-name>，容器的/etc会被覆盖，当你也可以另指定一个目录以避免覆盖。
+（5）-e，--env
+设置环境变量。
+用法：docker run -e MY_ENV_VAR=value 镜像名
+（6）--rm
+容器停止后自动删除容器。
+（7）-it
+以交互模式运行容器。
+docker run -it 镜像名 /bin/bash
+（8）--network
+指定容器加入的网络。
+用法：docker run --network 网络名 镜像名
+（9）--restart
+设置容器的重启策略。例如，always 会使容器在退出后自动重启。
+用法：docker run --restart always 镜像名
+（10）-w，--workdir
+指定工作目录。
+用法：docker run -w 工作目录 镜像名
+
+2 查看正在运行中的容器
+docker ps
+
+3 查看所有容器
+docker ps -a
+
+4 停止一个运行中的容器
+docker stop <container>
+
+5 启动一个已停止的容器
+docker start <container>
+
+6 删除已停止的容器
+docker rm <container>
+
+7 强制删除正在运行的容器
+docker rm -f <container>
+
+8 查看容器日志
+docker logs <container>
+
+9 进入容器
+docker exec -it <container> /bin/bash
+
+10 将文件从主机复制到容器中（反之亦然）
+docker cp <localfile> <container>:</path>
+
+11 查看容器资源使用情况
+docker stats
+
+
+
+
+
+
+
+三 除了拉取别人的docker镜像，如何构建自己的docker镜像？（关键就是如何写dockerfile？）
+（零） 基本问题
+0 dockerfile是什么？就是一个shell脚本，因而shell脚本有的语法它也可以有。
+
+1 构建镜像命令
+docker build -t <image_name>:<tag> <path>
+注意：
+（1）<path>是一个目录而非一个文件，这个目录代表了一个镜像，里面必须有dockerfile文件。
+（2）dockerfile文件的名字可以写成dockerfile或者Dockerfile，这种情况下在docker build时你无需指定dockerfile文件，但如果你把dockerfile文件的名字写成了其他形式，那么你必须：docker build -t <image_name>:<tag> <path> -f <dockerfile-name>
+
+
+
+（一）dockerfile内置字符串
+0 FROM
+（0）理解：你在安装虚拟机的时候也得指定os镜像啊，docker也是这样的，当然docker可指定的基础镜像不只os，还可以是python等虚拟环境。
+（1）功能：指定基础镜像。
+（2）用法：FROM 镜像名:TAG
+（3）有哪些基础镜像？
+a 官方基础镜像：
+ubuntu：Ubuntu 操作系统的官方镜像。
+alpine：一个非常小的 Linux 发行版，适合用于构建轻量级镜像。
+debian：Debian 操作系统的官方镜像。
+python：带有 Python 环境的镜像。
+node：带有 Node.js 环境的镜像。
+b 语言和框架镜像：
+openjdk：Java 开发环境的镜像。
+ruby：Ruby 环境的镜像。
+nginx：Nginx Web 服务器的镜像。
+c 自定义镜像：
+你可以使用其他镜像作为基础镜像，只需提供其名称和标签（例如 myuser/myimage:tag）。 
+
+1 RUN
+（1）功能：在构建时执行命令，注意是构建。
+（2）用法：RUN 命令
+
+2 ARG
+（1）功能：指定变量。
+（2）用法：ARG 变量名=变量值
+（3）例子：
+ARG VERSION=1.0
+FROM alpine:${VERSION}
+
+3 CMD
+（1）功能：容器启动时执行的命令。只能有一条，如果你写了很多默认执行最后一条。
+（2）用法：
+a exec法：CMD ["","",...]
+b shell法：CMD 命令，但是这样不好容易不成功。
+（3）例子：CMD ["nc","-lvnp","192.168.43.223"]
+
+
+4 ENTRYPOINT
+（1）功能：同CMD，但是它可以只设置命令的名字，由CMD负责参数。
+（2）用法：同CMD。
+（3）例子：
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+
+5 WORKDIR 
+（1）功能：设置工作目录。后续命令将在此目录下执行，默认为docker build指定的那个。
+（2）用法：WORKDIR 目录
+
+6 USER
+（1）功能：指定容器运行时使用的用户名或者UID。
+（2）用法：USER 用户名或UID
+（3）注意：如果你不指定那么默认为root。
+
+7 EXPOSE
+（1）功能：声明容器会监听的端口。注意是声明。
+（2）用法：EXPOSE 端口号
+（3）注意：声明而不是实际开启该端口的监听。实际开放那取决于容器内的程序和端口映射。
+
+8 VOLUME
+（0）数据卷：看上去和普通目录没啥区别，但是卷是持久的即容器重启也还在但是普通目录就不是了。
+（1）功能：创建数据卷。
+（2）用法：VOLUME ["path"]
+（3）例子：VOLUME ["/data"]
+
+9 ENV
+（1）功能：设置环境变量。
+（2）用法：ENV 变量吗=变量值
+
+10 COPY
+（0）注意：这是在构建时复制的，不是在容器运行时，所以这些被复制过去的文件会成为镜像的一部分，在容器重启后并不会消失。
+（1）功能：从宿主机复制文件到镜像。
+（2）用法：COPY 宿主机文件 容器主机路径
+
+11 ADD
+（1）功能：同COPY。但可以解压 tar 文件并支持从 URL 复制。
+（2）用法：从宿主机复制文件到镜像。
+（3）例子：
+a ADD myarchive.tar.gz /app
+b ADD url /app

@@ -1,0 +1,6 @@
+零 proxychains是什么？——一个Linux自带的代理客户端，目前支持socks5、socks4、http、https。
+
+一 使用方法：
+1 vim /etc/proxychains4.conf，写入代理服务比如socks5 192.168.43.171 1141
+
+2 在一个网络应用客户程序的启动命令前加上proxychains。

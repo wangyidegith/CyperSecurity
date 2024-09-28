@@ -1,5 +1,4 @@
-1
-md5sum [OPTION] <FILE（可以有多个）>
+一 md5sum [OPTION] <FILE（可以有多个）>
 
 option：
 -b 或 --binary：以二进制模式读取文件。
@@ -21,5 +20,18 @@ md5sum -c <包含md5sum <file>输出结果的文件>
 
 
 
-2
-sha系列也有命令，比如sha256sum，用法和md5sum一致。
+
+
+
+
+二 sha系列也有命令，比如sha256sum，用法和md5sum一致。
+
+
+
+
+
+
+
+三 它们都只能操作文件，如何校验字符串？
+echo -n "your_string" | sha256sum
+注意 -n 选项用于防止 echo 在字符串后面添加换行符。

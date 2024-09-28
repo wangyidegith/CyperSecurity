@@ -1,1 +1,4 @@
 gpasswd 用户组名
+
+该命令也可以添加用户到一个组中：
+gpasswd -a <user> <group>

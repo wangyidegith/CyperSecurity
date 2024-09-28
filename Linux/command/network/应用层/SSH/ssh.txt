@@ -42,20 +42,33 @@ $代表处在普通用户权限下
 
 
 
-三 使用ssh制作隧道
+三 使用ssh制作隧道（ssh可以起socks5代理）
+（零）选项：
+-C：压缩数据，提高性能。
+-q：安静。
+-N：不登录。
+-f：后台运行。
+-g：允许其他主机连接。
+
+
+
 （一）正向代理
 在proxy client上执行：ssh -L server-proxy-ip:server-proxy-port:dst-server-ip:dst-server-port -N -f -g -p proxy-server-port(22) proxy-server-user@proxy-server-ip
 
 
 
-（二）反向代理
-在proxy client上执行：ssh -R server-proxy-ip:server-proxy-port:dst-server-ip:dst-server-port -N -F -g -p proxy-server-port(22) proxy-server-user@proxy-server-ip
-注：区别在于L和R的区别，在使用上，根本没有区别，但是用的人心里必须知道自己在使用正向代理还是反向代理，因为它们的用途是不一样的。
-
-
-
-（三）动态端口转发（不能反向）：
+（二）动态本地正向代理：
 ssh -D 在proxychains中配置的socks5代理 -N -f -g 远程服务器用户@远程服务器IP地址
+
+
+
+（三）反向代理和反向动态代理
+在proxy client上执行：ssh -R server-proxy-ip:server-proxy-port[:dst-server-ip:dst-server-port] -N -F -g -p proxy-server-port(22) proxy-server-user@proxy-server-ip
+注：区别在于L和R的区别，用户在使用上，根本没有区别，但是用的人心里必须知道自己在使用正向代理还是反向代理，因为它们的用途是不一样的。
+
+
+
+
 
 
 
