@@ -29,5 +29,5 @@ sudo ufw deny <application_name>
 sudo ufw allow from <ip_address>
 sudo ufw deny from <ip_address>
 12 删除规则
-sudo ufw status numberd
+sudo ufw status number
 sudo delete number

@@ -72,6 +72,13 @@ run <script-name>，
 
 
 二 持久化（更宽泛的概念应该叫权限维持）
+（零）无持久化的payload的网络行为分析：
+1 过一段时间就会检测回连。
+
+2 一旦检测到网络没了就停止检测回连，进程就死了。（这不应该，但是经过测试确实如此）
+
+3 重启相当于杀死进程，自然不会有任何回连。（持久化要解决的问题是重启之后（进程被杀了以后）仍能回连）
+
 （一）进程迁移
 0 意义：当回连时，最好先进行一番进程迁移，将其迁移到一些常见的不会被用户马上关闭的后台进程里，也是权限维持的一个方法。
 
@@ -107,7 +114,7 @@ set SESSION <会话id>
    Name      Current Setting  Required  Description
    ----      ---------------  --------  -----------
    DELAY     10               yes       Delay (in seconds) for persistent payload to keep reconnecting back.   // 断连后多长时间回连一次，默认10s
-   EXE_NAME                   no        The filename for the payload to be used on the target host (%RAND%.exe by default).   // 木马名称，默认就是你原来的那个，而且位置也不会变
+   EXE_NAME                   no        The filename for the payload to be used on the target host (%RAND%.exe by default).   // 木马名称，默认就是你原来的那个，没有自删除位置
    PATH                       no        Path to write payload (%TEMP% by default).   // 加载脚本所存储的目录，默认在c:\users\user-name\appdata\local\temp
    REG_NAME                   no        The name to call registry value for persistence on target host (%RAND% by default).   // 这里体现了采用的持久化方法是修改注册表，至于更进一步的原理，再议
    STARTUP   USER             yes       Startup type for the persistent payload. (Accepted: USER, SYSTEM)   // 在什么时候回连，有USER, SYSTEM，SYSTEM需要受害者以administrator权限运行payload才能生效
@@ -131,8 +138,7 @@ set SESSION <会话id>
 3 exploit
 
 
-
-（四）测试结果：只能说断了网能连回来，但是目标机这边一旦进程死了就废了。
+（四）对上面（二）（三）测试结果：虽然能回连，但是会弹窗”脚本执行出错“。
 
 
 
@@ -180,4 +186,40 @@ exploit/windows/local/persistence_image_exec_options
 
 
 
-五 隧道
+五 隧道（防溯源，也涉及横移的思路）
+1 payload
+（1）windows
+payload/windows/vncinject/reverse_http_proxy_pstore
+payload/windows/dllinject/reverse_http_proxy_pstore
+payload/windows/meterpreter/reverse_http_proxy_pstore
+payload/windows/meterpreter/reverse_https_proxy
+经测试：不行。
+SOCKS：代理测试通过，但是不回连（观察代理的网络连接状态知：established短暂停留一下然后就time-wait，观察进程这边起来一下就死了），猜测是socks协议版本不匹配的问题，我用的是socks5，msf也许用的socks4。
+HTTP：代理服务工具使用的squid
+（
+最简配置（记得放到/etc/squid/squid.confde最前面）：
+acl all src 0.0.0.0/0
+http_access allow all
+http_port <proxy-listen-port>
+），
+测试通过，但是不回连（观察代理的网络连接状态知：established短暂停留一下然后就time-wait，观察进程这边起来一下就死了），莫非非得用ssl？
+payload/windows/custom/reverse_http_proxy_pstore
+payload/windows/custom/reverse_https_proxy
+（2）cmd
+payload/cmd/windows/powershell/dllinject/reverse_http_proxy_pstore
+payload/cmd/windows/powershell/vncinject/reverse_http_proxy_pstore
+payload/cmd/windows/powershell/meterpreter/reverse_http_proxy_pstore
+payload/cmd/windows/powershell/meterpreter/reverse_https_proxy
+payload/cmd/windows/powershell/custom/reverse_http_proxy_pstore
+payload/cmd/windows/powershell/custom/reverse_https_proxy
+
+2 auxiliary/server/socks_proxy：就是个socks5代理服务。
+
+
+（二）meterpreter
+1 pivot（跳板）
+（0）我的理解（我认为的应用场景）：控下双网卡主机但该主机没路由时，该主机可以作为pivot，可作为其他主机的回连时的代理也作为主动向其他主机发起连接。
+（1）实际测试：在跳板机上确实可以拿到一个pipe://192.168.43.219/msf-pipe-test，但时怎么用呢？
+（3）目前我没有找见”在目标机上起socks5代理“的功能（按理说应该有）。
+
+2 portfwd（== ssh -L + ssh -R）：要注意：外 connect 内 == 正向（local），内 connect 外 == 反向（remote），我们一般认为ssh -R这种是反向，是的这没错，但是你要注意，虽然反弹连接时反着出去的，但是攻击指令由外到内恰恰是正向的。
