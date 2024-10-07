@@ -19,7 +19,7 @@
 1 答案：
 （1）root_squash（默认）：
 root -> nobody
-common -> common：这是什么意思？比如用户A创建了一个文件，搁A这ll，属主和主组肯定是A啊，但是搁B那ll就是B了。
+common -> common：这是什么意思？比如用户A创建了一个文件，搁A这执行ll命令，属主和主组肯定是A啊，但是搁B那执行ll命令看到的就是B了。
 （2）no_root_squash（提权漏洞）：
 root -> root：这就有问题了，黑客可以挂载到共享目录上，放一个.c：
 #include <stdlib.h>

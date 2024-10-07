@@ -7,7 +7,11 @@
 5 -v：verbose
 6 -D：decoy
 原理：nmap并不是通过在单个 IP 数据包头部塞入伪装地址来实现 -D 选项的功能（这不是dos攻击，是需要收到响应的），而是一次探测发送多个探测包，其中只有一个含有真实IP地址，从而达到隐藏真实 IP 的目的。
-7 最基本命令：nmap <ip-addr or domain-name> == sudo nmap -sS <ip-addr or domain-name>
+7 最基本命令（五大命令）：
+nmap <ip-addr or domain-name> == sudo nmap -sS <ip-addr or domain-name>
+-sn
+-sV：比-sS好
+-O
 
 
 

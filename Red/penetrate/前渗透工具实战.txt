@@ -1,0 +1,177 @@
+零 
+1 思路类型：分主机和web两大类型。
+
+2 思路：不管是哪个类型，都是两大步四小步，其中两大步是渗透流程中的第一大步的第二小步和第二大步，工具一般到手工挖掘之前。
+
+3 这篇文章说工具，网站和插件当然也是工具，但在这里不说，网站详见hack.html，插件就是八大插件。
+
+
+
+
+
+
+
+一 主机（这里以一个域名或IP地址为起点）
+（零）全流程工具（目前市面上的主机漏洞挖掘自动化工具一般到爆破，第四步的涉及二进制漏洞挖掘工具难以胜任）
+0 nmap
+
+1 kscan（其实就是高级nmap）：主要功能是主机指纹搜集、C段扫描、暴力破解，其exp模块正在开发中。
+（1）指纹搜集
+./kscan_linux_amd64 -t <ip地址>
+（2）扫C段
+./kscan_linux_amd64 -t<ip地址/24>
+（3）结合fuzzdict做爆破
+./kscan_linux_amd64 --hydra --hydra-user <user.txt> --hydra-pass <pass.txt>
+
+
+
+第一大步：信息搜集
+（一）IP地址
+1 -sn：拿IP地址
+2 ping
+3 dns探测：dig、nslookup、host
+注：过CDN。
+
+
+（二）指纹信息
+1 -O：拿内核版本，根据内核版本查发行版本
+
+2 -sV：拿开放端口号及对应服务及服务版本（-sS：只拿开放端口号及对应服务，-V：拿CPU架构）
+
+3 一个重要的实战经验：直接-p、-sS虽然也能探测到版本但是没有-sV好，比如ssh服务，-sV就能探测出来但是-sS就不行。
+
+
+
+第二大步：漏洞挖掘
+（三）在以上基础上，至少有两类漏洞你可以直接探起来了：
+1 根据指纹信息就可以去寻找系统和服务的版本漏洞了。
+
+2 弱口令
+
+
+
+（四）继续探测端口号的服务，并开始漏洞挖掘。
+
+
+
+
+
+
+
+二 web（一般以域名为起点）
+（零）全流程工具
+0 自动化工具挖洞的原理：其实就是两大步四小步的自动化，你给他一个域名，它会去探测子域名，搜集指纹信息，根据自己的指纹库去poc，至于说探测未知漏洞，它一般做不到，所以看一个漏洞挖掘工具好不好，关键是看它的字典好不好，他能不能探测到更多的子域名和指纹，他的指纹库是否精准完备。
+
+1 ARL（全面）：https://tophanttechnology.github.io/ARL-doc/
+（0）基本认识：
+cs结构。
+（1）完整度：完备。
+（2）测试：已有poc不太行，得改。
+
+2 mitan：https://github.com/kkbo8005/mitan
+（1）对初学者非常友好。
+（2）不完备，到敏感信息搜集。
+
+3 TscanPlus：https://github.com/TideSec/TscanPlus/
+（1）相当完备的web渗透全流程工具。
+（2）美中不足的是：完整poc信息需要vip。
+
+4 goby：https://github.com/gobysec/Goby
+
+5 dddd：https://github.com/SleepingBag945/dddd
+侧重供应链漏洞探测。
+
+从这开始要以思路（两大步四小步中的前三小步：子域名、指纹、漏扫）为基点去说工具，单一说工具也没啥用：
+
+1 fofa2Xray：https://github.com/piaolin/fofa2Xray
+注：需要fofa-api
+
+2 爱企查（或fofa或fofa_view） + rad（https://github.com/chaitin/rad） + xray（https://github.com/chaitin/xray）
+（1）
+使用爱企查搜集“互联网行业 + 资产大于5000w + 有网址”的企业URL。
+fofa或fofa_view：host="edu.cn" && is_domain=true && Country="CN" && staus_code=200
+（2）
+xray.exe webscan --listen 127.0.0.1:9999 --html-output result.html
+rad_windows_amd64.exe --url-file url.txt --http-proxy 127.0.0.1:9999 -wait-login
+
+3 fofa（也可以hunter、quake、zoomeye） + hfinger（高级ehole，https://github.com/HackAllSec/hfinger） + xray（https://github.com/chaitin/xray）
+或许需要一个python脚本对fofa搜集到的资产做一些清洗，得到一个urls.txt
+hfinge.exe -f urls.txt --output-xlsx data.xlsx
+hfinger.exe -l 127.0.0.1:3333 -p https://127.0.0.1:7777 --output-xlsx HfiXray.xlsx
+xray.exe webscan --listen 127.0.0.1:7777 --html-output data.html
+
+
+
+第一大步：信息搜集
+（一）资产（工具都是关于域名的）：域名、公司名、小程序/公众号、APP、IP地址。
+1 subfinder（最经典的子域名搜集工具）：搜集子域名，而且是被动搜集。
+（1）https://github.com/projectdiscovery/subfinder
+（2）被动搜集子域名的意思是它通过查询公开的网络资源和数据库来发现子域名，而不是直接扫描目标域名或进行主动的探测。这是目前我见过的唯一一款全面被动搜集资产的工具（JSFinder可以通过爬取页面进行搜集，针对性更强），其他都是爆破。
+（3）选项：
+-d domain
+（4）拿到域名后：在https://uutool.cn/url-http/将搜集到的子域名制成url。
+
+2 layer子域名挖掘机：https://www.webshell.cc/6384.html。5.0新版：https://pan.baidu.com/s/lwEP_Ysg4qsFbm_k1aoncpg，uk1j。
+
+3 OneForAll：https://github.com/shmilylty/OneForAll
+
+4 几款检测暗链的工具：
+Libra
+dc_find
+aljcscan
+
+
+
+（二）指纹：容器、框架、语言，前两者涉及中间件漏洞。
+1 Ehole：https://github.com/EdgeSecurityTeam/EHole
+识别cms
+
+2 httpx：https://github.com/projectdiscovery/httpx
+
+3 IISPutScanner：不光能用来搜C段，也可以用来探测web服务器类型和版本，更可以用来探测上传漏洞。
+
+
+
+第二大步：漏洞挖掘
+（三）在以上基础上，至少有两类漏洞你可以直接探起来了：
+1 中间件漏洞：去谷歌、百度、exp收录网站上查。
+
+2 敏感信息泄露
+
+3 弱口令
+
+
+
+（四）web漏洞（下面介绍专门用来poc web漏洞的工具）
+1 POC-bomber：https://github.com/tr0uble-mAker/POC-bomber
+用法：python3 pocbomber.py
+模式:
+            获取poc/exp信息:   python3 pocbomber.py --show
+            单目标检测:        python3 pocbomber.py -u http://xxx.xxx.xx
+            批量检测:          python3 pocbomber.py -f url.txt -o report.txt 
+            指定poc检测:       python3 pocbomber.py -f url.txt --poc="thinkphp2_rce.py"
+            exp攻击模式:       python3 pocbomber.py -u 目标url --poc="指定poc文件" --attack
+参数:
+            -u  --url      目标url
+            -f  --file     指定目标url文件   
+            -o  --output   指定生成报告的文件(默认不生成报告)
+            -p  --poc      指定单个或多个poc进行检测, 直接传入poc文件名, 多个poc用(,)分开
+            -t  --thread   指定线程池最大并发数量(默认30)
+            --show         展示poc/exp详细信息
+            --attack       使用poc文件中的exp进行攻击
+            --dnslog       使用dnslog平台检测无回显漏洞(默认不启用dnslog,可在配置文件中启用)
+
+2 BBScan：https://github.com/lijiejie/BBScan
+（1）python3 BBScan.py
+--host <url>
+-f <urllist>
+（2）在report目录下可以找见漏洞报告（不像pocbomb一样没漏洞就不生成报告，bbscan不管有没有漏洞都会生成报告）。
+
+3 vulmap：https://github.com/zhzyker/vulmap
+
+4 nuclei：https://github.com/projectdiscovery/nuclei
+
+5 meppo：https://github.com/WingsSec/Meppo
+据说能快速检测高危漏洞。
+
+6 afrog：https://github.com/zan8in/afrog

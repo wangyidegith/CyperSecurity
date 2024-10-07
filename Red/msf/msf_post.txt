@@ -138,9 +138,6 @@ set SESSION <会话id>
 3 exploit
 
 
-（四）对上面（二）（三）测试结果：虽然能回连，但是会弹窗”脚本执行出错“。
-
-
 
 （五）其它持久化模块
 exploit/windows/local/persistence_service：它需要root，经测试不行
@@ -149,7 +146,11 @@ exploit/windows/local/persistence_image_exec_options
 
 
 
-（六）我发现set和cs生成的hta马可以自行开机自启。
+（六）测试结果：虽然能回连，但是会弹窗”脚本执行出错“。
+
+
+
+（七）我发现set和cs生成的hta马可以自行开机自启。
 
 
 
@@ -170,7 +171,7 @@ exploit/windows/local/persistence_image_exec_options
 
 
 
-（二）其实更多时候提权使用的是各种shell命令。
+（二）其实更多时候提权使用的是各种shell命令，详见《提权》。
 
 
 
@@ -178,7 +179,19 @@ exploit/windows/local/persistence_image_exec_options
 
 
 
-四 横移
+四 横移（根本问题是：这些都需要在受害机上有msf啊，这如何解决？按我的思考其他受害机尤其是内网中的受害机应该是可以中继回来的，莫非还真要在受害机上安装msf？）
+（一）exploit/windows/smb/psexec
+
+
+
+（二）exploit/multi/ssh/sshexec
+
+
+
+（三）msf横移提供了令牌冒用的方法：
+1 incognito可以窃取令牌（窃取谁的？按我的思考应该是本地，莫非其他主机也行？）
+
+2 auxiliary/server/capture/smb可以捕获其他用户的令牌（怎么捕获？按我的思考应该是抓包，但是好像是“设置smb服务，守株待兔，然后兔为什么要上钩？”）
 
 
 

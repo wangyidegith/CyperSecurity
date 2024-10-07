@@ -105,6 +105,11 @@ exit（quit）
 6 expoit
 用在两类模块里：expoit和payload。
 
+7 环境变量相关命令：
+（0）环境变量是msf的系统全局变量，可以设置然后给每个模块使用，和os环境变量一个道理。
+（1）命令：setg、getg、unsetg
+（2）如何使用？set 某个选项 $某个环境变量
+
 
 
 

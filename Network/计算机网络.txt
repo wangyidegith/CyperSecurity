@@ -892,16 +892,19 @@ smtp协议同时也定义了邮件服务器如何发送邮件，
 搭建邮件传输代理的工具有：sendmail、postfix、ssmtp（msmtp）等。
 五 文件传输协议
 （零）基本的ftp、scp这些就不说了，请去其操作文档看具体操作。
-（一）NAS（内网域（关于域的概念，姑且认为域 == Active Directory）横移的两大分支之一，另一个是Kerberos协议之类的票据分发协议，在Linux的横移中，NFS的漏洞甚至可以独当一面）
+（一）NAS
 0 NAS的概念：
 （0）NAS是“网络附加存储”（Network Attached Storage）的缩写，指一种通过网络连接的存储设备，可以让多个用户和设备共享文件和数据。
 （1）NAS所涉及到的协议就是文件共享协议（FSP），目前主流的FSP有：
-a SMB/CIFS（Server Message Block/Common Internet File System）：广泛用于Windows系统，允许文件共享和打印服务。
+a SMB/CIFS（Server Message Block/Common Internet File System）：
+广泛用于Windows系统。
+允许文件共享和打印服务。
 CIFS是SMB 1.0。
 虽然SMB被设计用于Windows，但是Linux用户可以通过Samba软件使用它。
+默认端口445。
 b NFS（Network File System）：主要用于Unix和Linux系统，支持远程文件系统的共享。
 1 安全性：通过概念就可以看出该协议的存在虽然方便了办公但是存在严重的安全问题。
-2 与SMB协议、NFS协议有关的命令请详见Linux命令、Windows命令。
+2 与SMB协议、NFS协议有关的命令请详见Windows命令、Linux命令。
 
 
 
@@ -1015,7 +1018,7 @@ A向B发送报文，sha256（明文）得到哈希值作为报文鉴别码，放
 第二步：KDC产生一个随机的会话密钥KAB，响应一个使用KA加密的[KAB，请A转给B的票据（ticket）]给A，其中，ticket是使用KB加密的[KAB]
 第三步：A拿到[KAB，请A转给B的票据（ticket）]后，解密得到ticket，发送给B。
 第四步：B拿到ticket后，解密拿到KAB，自此，A和B就可以愉快地通信了。
-1 对称密钥的分配：kerberos协议（（内网域横移的两大分支之一，另一个是NAS，该分支是域（Active Directory），而Kerberos协议是当前Active Directory（姑且 == 域）使用的认证协议，老版本是NTLM））。
+1 对称密钥的分配：kerberos协议
 （1）用途：内网渗透中著名的域协议的核心协议之一（域协议准确的说是keberos和SMB、NFS等文件共享协议的结合，SMB负责文件共享（该协议将在），Kerberos负责认证）。
 （2）为什么在内网中得到了广泛应用？对称密钥的分配很容易被截获，所以这个协议在公网根本活不下去，但是在内网由于其高效被广泛使用，当然这也为内网渗透提供了土壤。
 （3）原理：

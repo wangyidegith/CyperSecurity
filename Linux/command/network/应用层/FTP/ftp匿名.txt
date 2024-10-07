@@ -1,0 +1,33 @@
+零 这是一个重要的漏洞
+1 扫到ftp服务
+
+2 ftp dst-ip
+
+3 anonymous
+
+
+
+
+
+
+
+一 如何配置一个ftp anonymous服务？
+（一）安装ftpd：sudo apt install vsftpd
+
+
+
+（二）sudo vim /etc/vsftpd.conf
+anonymous_enable=YES
+anon_root=<anonymous用户的根目录>
+no_anon_password=YES
+
+
+
+（三）设置<anonymous用户的根目录>的权限
+1 sudo chown -R ftp:ftp <anonymous用户的根目录>
+2 sudo chmod -R 555 <anonymous用户的根目录>
+注意：这里必须设置称555.vsftpd不允许匿名目录有写权限。
+
+
+
+（五）sudo systemctl restart vsftpd
