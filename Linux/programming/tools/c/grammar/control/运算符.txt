@@ -1,0 +1,205 @@
+一 算术运算符：
+（一）基本：+ - * / % ++ --
+
+
+
+（二）++、--的前后缀问题：
+1 前缀：先算。
+
+2 后缀：后算。
+
+
+
+
+
+
+
+二 关系运算符：==、!=、>、<、>=、<=
+
+
+
+
+
+
+
+三 逻辑运算符
+1 ||
+
+2 &&
+
+3 !
+
+
+
+
+
+
+
+四 位运算符
+1 |
+
+2 &
+
+3 ~
+
+4 ^：异或。同0异1。
+
+5 <<
+
+6 >>
+
+
+
+
+
+
+
+五 赋值运算符
+=	简单的赋值运算符，把右边操作数的值赋给左边操作数	C = A + B 将把 A + B 的值赋给 C
++=	加且赋值运算符，把右边操作数加上左边操作数的结果赋值给左边操作数	C += A 相当于 C = C + A
+-=	减且赋值运算符，把左边操作数减去右边操作数的结果赋值给左边操作数	C -= A 相当于 C = C - A
+*=	乘且赋值运算符，把右边操作数乘以左边操作数的结果赋值给左边操作数	C *= A 相当于 C = C * A
+/=	除且赋值运算符，把左边操作数除以右边操作数的结果赋值给左边操作数	C /= A 相当于 C = C / A
+%=	求模且赋值运算符，求两个操作数的模赋值给左边操作数	C %= A 相当于 C = C % A
+<<=	左移且赋值运算符	C <<= 2 等同于 C = C << 2
+>>=	右移且赋值运算符	C >>= 2 等同于 C = C >> 2
+&=	按位与且赋值运算符	C &= 2 等同于 C = C & 2
+^=	按位异或且赋值运算符	C ^= 2 等同于 C = C ^ 2
+|=	按位或且赋值运算符	C |= 2 等同于 C = C | 2
+
+
+
+
+
+
+
+六 杂项运算符（C语言中最核心的几个运算符，请牢记在心）
+（一）sizeof()	返回变量的所占内存的大小
+1 C语言的15种基本数据类型（不包括enum）
+#include <stdio.h>
+#include <stddef.h>  // 包含 ptrdiff_t 的定义
+
+int main() {
+/* 
+一 signed、unsigned、无修饰：
+    1 这三种所占空间不变。
+
+    2 无修饰取决于编译器，而编译器一般是signed。
+
+二 long可以用来区分x86和x64，x86下long是4B，x64下是8B，注意long long都是8B。
+
+三 除了long，x86和x64的核心区别在于：指针的长度。
+
+四 ptrdiff_t 是一个标识指针插值的数据类型（其实就是指针类型）。
+
+五 wchar_t 经测试再x64下是4B。
+
+六 _t 一般不说它是基本数据类型了而是加工数据类型，但其实本质上还是基本数据类型只是换了名字。
+*/
+    printf("Size of char: %zu byte(s)\n", sizeof(char));
+    printf("Size of unsigned char: %zu byte(s)\n", sizeof(unsigned char));
+    printf("Size of short: %zu byte(s)\n", sizeof(short));
+    printf("Size of unsigned short: %zu byte(s)\n", sizeof(unsigned short));
+    printf("Size of int: %zu byte(s)\n", sizeof(int));
+    printf("Size of unsigned int: %zu byte(s)\n", sizeof(unsigned int));
+    printf("Size of long: %zu byte(s)\n", sizeof(long));
+    printf("Size of unsigned long: %zu byte(s)\n", sizeof(unsigned long));
+    printf("Size of long long: %zu byte(s)\n", sizeof(long long));
+    printf("Size of unsigned long long: %zu byte(s)\n", sizeof(unsigned long long));
+    printf("Size of float: %zu byte(s)\n", sizeof(float));
+    printf("Size of double: %zu byte(s)\n", sizeof(double));
+    printf("Size of long double: %zu byte(s)\n", sizeof(long double));
+    printf("Size of wchar_t: %zu byte(s)\n", sizeof(wchar_t));
+    printf("Size of ptrdiff_t: %zu byte(s)\n", sizeof(ptrdiff_t));
+
+    return 0;
+}
+
+2 格式符
+（1）整数类型
+%d：有符号十进制整数。
+%i：有符号十进制整数（与%d相同）。
+%u：无符号十进制整数。
+%o：无符号八进制整数。
+%x：无符号十六进制整数（小写）。
+%X：无符号十六进制整数（大写）。
+%ld：长整型有符号十进制整数。
+%lu：长整型无符号十进制整数。
+%lld：长长整型有符号十进制整数。
+%llu：长长整型无符号十进制整数.
+（2）浮点类型
+%f：浮点数（小数形式）。
+注意：不管是float还是double都是浮点数。
+%e：浮点数（科学计数法，使用小写e）。
+%E：浮点数（科学计数法，使用大写E）。
+%g：根据数值自动选择%f或%e格式，去掉多余的零。
+%G：与%g类似，但使用大写E。
+（3）字符和字符串
+%c：单个字符。
+%s：字符串（字符数组）。
+（4）指针
+%p：指针的地址。
+（5）宽字符和字符串
+%lc：宽字符。
+%ls：宽字符串。
+（6）其他
+%n：将输出的字符数存储到对应的整数指针中。
+用法如下：
+#include <stdio.h>
+
+int main() {
+    int count;
+    printf("Hello, World!%n", &count);
+    printf("Number of characters printed: %d\n", count);
+    return 0;
+}
+%%：输出一个百分号字符（%）。
+%zu：用于输出size_t类型的无符号整数。
+注意：虽然也能用%ld（x64）、%p等替代，但是这个是标准用法
+%zd：用于输出ptrdiff_t类型的有符号整数。
+
+
+
+（二）&	返回变量的地址
+
+
+
+（三）*	从指针变量取该指针指向的变量
+
+
+
+注：理解&和*等于理解指针：
+首先指针的叫法要明确，我们很多时候说指针其实是说指针变量而非指针，指针 == 地址。
+指针的概念：指针是一个编号（长度取决于系统架构），表示每一个内存单元的位置。
+指针变量的概念：存储指针的变量。
+&不管&谁，都是拿到这个东西的第一个内存单元的地址即首地址。
+*拿的是该指针变量指向（所谓“指向”即是这个指针变量存的地址是另一片内存的首地址）的内存区的数据。
+
+
+
+（四）条件? X:Y	条件表达式（如果条件为真，则值为 X ，否则值为 Y）
+a = 10;
+b = (a == 1) ? 20: 30;   // 前真后假
+
+
+
+
+
+
+
+七 各个运算符的优先级和结合性（不用细记，实在记不住加()）
+后缀 	() [] -> . ++ - -  	从左到右 
+一元 	+ - ! ~ ++ - - (type)* & sizeof 	从右到左 
+乘除 	* / % 	从左到右 
+加减 	+ - 	从左到右 
+移位 	<< >> 	从左到右 
+关系 	< <= > >= 	从左到右 
+相等 	== != 	从左到右 
+位与 AND 	& 	从左到右 
+位异或 XOR 	^ 	从左到右 
+位或 OR 	| 	从左到右 
+逻辑与 AND 	&& 	从左到右 
+逻辑或 OR 	|| 	从左到右 
+条件 	?: 	从右到左 
+赋值 	= += -= *= /= %=>>= <<= &= ^= |= 	从右到左 
+逗号 	, 	从左到右 

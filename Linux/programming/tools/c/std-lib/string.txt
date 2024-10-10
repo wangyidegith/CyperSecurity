@@ -1,0 +1,154 @@
+注：在认识常用函数之前，先说清楚一件事：<string.h>的所有函数都不管'\0'！
+
+
+
+
+
+
+
+1 测定字符串长度：
+函数原型：size_t strlen(const char *str);
+
+        返回值：无符号长整型（%ld）
+
+        参数：需要测定长度的字符串
+
+
+
+
+
+
+
+2 字符串复制函数：（注意：dest要大于等于src，要不会造成内存溢出）
+函数原型：char* strcpy(char* dest, const char* src);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源字符串
+
+
+函数原型：char* strncpy(char* dest, const char* src, size_t n);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源字符串
+
+                   n        要从src复制的字符数
+
+
+函数原型：void* memcpy(void* dest, const void* src, size_t n);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源字符串
+
+                   n        要从src复制的字符数
+
+
+函数原型：void* memmove(void* dest, const void* src, size_t n);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源字符串
+
+                   n        要从src复制的字符数
+
+
+
+
+
+
+
+3 字符串比较函数：
+函数原型：int memcmp(const void* str1, const void* str2, size_t n)
+
+        返回值：如果返回值 < 0，则表示 str1 小于 str2
+
+                      如果返回值 > 0，则表示 str1 大于 str2
+
+                      如果返回值 = 0，则表示 str1 等于 str2
+
+        参数：str1        第一个字符串
+
+                   str2        第二个字符串
+
+                   n        要比较的字符个数
+
+
+函数原型：int strcmp(const char* str1, const char* str2);
+
+        返回值：如果返回值 < 0，则表示 str1 小于 str2
+
+                      如果返回值 > 0，则表示 str1 大于 str2
+
+                      如果返回值 = 0，则表示 str1 等于 str2
+
+        参数：str1        第一个字符串
+
+                   str2        第二个字符串
+
+
+函数原型：int strncmp(const char* str1, const char* str2);
+
+        返回值：如果返回值 < 0，则表示 str1 小于 str2
+
+                      如果返回值 > 0，则表示 str1 大于 str2
+
+                      如果返回值 = 0，则表示 str1 等于 str2
+
+        参数：str1        第一个字符串
+
+                   str2        第二个字符串
+
+                   n        要比较的字符个数
+
+
+
+
+
+
+
+4 字符串追加函数：（注意：dest要大于dest+src，要不会造成内存溢出）
+函数原型：char* strcat(char* dest, const char* src);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源串
+
+
+函数原型：char* strncat(char* dest, const char* src, size_t n);
+
+        返回值：指向了dest的指针
+
+        参数：dest        目标内存
+
+                   src        源串
+
+                   n        要追加的字符个数
+
+
+
+
+
+
+
+5 字符串置同一字符函数：（该函数可以将字符串的前n个字符都置为同一字符，我们经常使用到的置0操作便是使用该函数）
+函数原型：void* memset(void* str, int c, size_t n)
+
+        返回值：指向了str的指针
+
+        参数：str        要操作的字符串
+
+                   c        字符
+
+                   n        要被设置为c的前多少个字符

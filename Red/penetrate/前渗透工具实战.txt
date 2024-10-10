@@ -96,7 +96,7 @@ rad_windows_amd64.exe --url-file url.txt --http-proxy 127.0.0.1:9999 -wait-login
 
 3 fofa（也可以hunter、quake、zoomeye） + hfinger（高级ehole，https://github.com/HackAllSec/hfinger） + xray（https://github.com/chaitin/xray）
 或许需要一个python脚本对fofa搜集到的资产做一些清洗，得到一个urls.txt
-hfinge.exe -f urls.txt --output-xlsx data.xlsx
+hfinger.exe -f urls.txt --output-xlsx data.xlsx
 hfinger.exe -l 127.0.0.1:3333 -p https://127.0.0.1:7777 --output-xlsx HfiXray.xlsx
 xray.exe webscan --listen 127.0.0.1:7777 --html-output data.html
 

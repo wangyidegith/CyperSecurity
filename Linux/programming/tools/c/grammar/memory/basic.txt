@@ -1,0 +1,361 @@
+零 C语言中数据的五大属性
+1 名（符号）
+
+2 值
+
+3 地址
+
+4 类型
+
+5 存储
+
+
+
+
+
+
+
+一 地址及指针数据类型
+0 首先指针的叫法要明确，我们很多时候说指针其实是说指针变量而非指针，指针 == 地址。
+
+1 指针的概念：指针是一个编号（长度取决于系统架构），表示每一个内存单元的位置。
+
+2 指针变量的概念：
+（1）简单说，存储指针的变量。
+（2）这是一种复合数据类型，由指针和指针所指向的数据类型复合而成的
+
+3 两个与指针相关的操作符：
+（1）&：返回变量的地址
+拿到这个数据的第一个内存单元的地址即首地址。
+（2）*：返回指针变量指向的数据
+拿的是该指针变量指向（所谓“指向”即是这个指针变量存的地址是另一片内存的首地址）的内存区的数据。
+
+
+
+
+
+
+
+二 数据类型
+（零）基本问题
+1 数据声明、定义、初始化
+（1）声明：我要用这个东西，但是还没用它，你不要给我申请内存空间。
+（2）定义：我现在就要用这个东西，你给我申请好内存空间。
+注：对于基本数据类型、复合数据类型（指针、数组、字符串）的指针，声明和定义同时进行。
+（3）初始化：定义时赋值。
+这里有一个问题，如果不初始化，各种数据类型的默认值是什么？（最好严格进行初始化）
+a const必须初始化；
+b static默认值为0；
+c 指针默认指为NULL；
+d 其他数据类型的默认值随机；
+
+2 数据类型分类
+（1）基本数据类型
+（2）复合数据类型
+（3）构造数据类型
+
+3 typedef
+（1）语法：typedef 旧数据类型 新数据类型
+（2）typedef 和 #define的区别
+a typedef 仅限于为类型定义符号名称，#define 不仅可以为类型定义别名，也能为数值定义别名，比如您可以定义 1 为 ONE；
+b typedef 是由编译器执行解释的，#define 语句是由预编译器进行处理的。
+（3）经典用法：
+typedef struct
+{
+   char  title[50];
+   char  author[50];
+   char  subject[100];
+   int   book_id;
+} Book;
+（4）对于基本数据类型typedef出来的命名规则最好使用“原数据名_t”作为结尾以进行标识和区分。
+
+4 类型转换
+（0）大小问题：
+a 基本的大小问题：
+比如int和long，一个4B，一个8B，int转long是小转大，long转int是大转小，这个大小肉眼可见。
+b 那么如果是int和float呢？
+这两个可都是4B啊，浮点数大于整数。
+c 那如果是int和unsigned int呢？
+这两个也都是4B，按存储方式来看，unsigned更大，因而有符号转无符号是小转大，无符号转有符号是大转小。
+（1）自动类型转换：“无所谓，编译器会出手”。
+a 不同类型的数据运算：
+（a）有浮点数（不管是float还是double），所有对象统一转double；
+（b）没浮点数，有大则转大。
+b 不同类型的数据赋值：
+右边的转成左边的。这个得视具体情况而定，有的时候有的编译器会报错，有的则进行转换。
+注：类型转换所存在的问题：小转大一般没有什么问题，唯一的问题是造成了内存浪费，大转小问题就大了，可能会造成数据的精度丢失甚至截断，上世纪90年代的一次火箭发射事故的原因就在于一行未进行强制类型转换的代码引发的运算错误，所以最好不要让编译器帮你做自动类型转换，而是要由程序员做强制类型转换，也就是说一个好的程序员必须知道自己在做什么。
+（2）强制类型转换：
+a 语法：(type_name) expression
+b 强制类型转换的核心用法：你可以设置一根void*指针用来接收任何数据类型的指针变量（反正对于指针而言都是去拿首地址）然后再转换成其他数据类型（比如把char*转成某种struct*，亦或把某种struct*转成char*）。
+
+
+
+（一）基本数据类型
+1 15种基本数据类型（不包括enum）
+#include <stdio.h>
+#include <stddef.h>  // 包含 ptrdiff_t 的定义
+
+int main() {
+/* 
+一 signed、unsigned、无修饰：
+    1 这三种所占空间不变。
+
+    2 无修饰取决于编译器，而编译器一般是signed。
+
+二 long可以用来区分x86和x64，x86下long是4B，x64下是8B，注意long long都是8B。
+
+三 除了long，x86和x64的核心区别在于：指针的长度。
+
+四 ptrdiff_t 是一个标识指针插值的数据类型（其实就是指针类型）。
+
+五 wchar_t 经测试再x64下是4B。
+
+六 _t 一般不说它是基本数据类型了而是加工数据类型，但其实本质上还是基本数据类型只是换了名字。
+*/
+    printf("Size of char: %zu byte(s)\n", sizeof(char));
+    printf("Size of unsigned char: %zu byte(s)\n", sizeof(unsigned char));
+    printf("Size of short: %zu byte(s)\n", sizeof(short));
+    printf("Size of unsigned short: %zu byte(s)\n", sizeof(unsigned short));
+    printf("Size of int: %zu byte(s)\n", sizeof(int));
+    printf("Size of unsigned int: %zu byte(s)\n", sizeof(unsigned int));
+    printf("Size of long: %zu byte(s)\n", sizeof(long));
+    printf("Size of unsigned long: %zu byte(s)\n", sizeof(unsigned long));
+    printf("Size of long long: %zu byte(s)\n", sizeof(long long));
+    printf("Size of unsigned long long: %zu byte(s)\n", sizeof(unsigned long long));
+    printf("Size of float: %zu byte(s)\n", sizeof(float));
+    printf("Size of double: %zu byte(s)\n", sizeof(double));
+    printf("Size of long double: %zu byte(s)\n", sizeof(long double));
+    printf("Size of wchar_t: %zu byte(s)\n", sizeof(wchar_t));
+    printf("Size of ptrdiff_t: %zu byte(s)\n", sizeof(ptrdiff_t));
+
+    return 0;
+}
+
+2 enum
+（1）如何声明、定义、初始化？和struct一样。
+（2）如何使用？这和struct可不一样，它必须使用enum声明的字段给enum变量赋值。
+（3）本质：
+a 每个字段就是整型；
+b 有默认值，比如enum color { red, green=5, blue };，那么red还是0，由于green被初始化成了5，blue的值是6。
+
+3 void
+（1）概念：无数据类型。
+（2）用处：
+a 函数返回值；
+b 函数参数；
+c 和指针结合，进行强制类型转换，这也是强制类型转换的核心用法：即你可以设置一根void*指针用来接收任何数据类型的指针变量（反正对于指针而言都是去拿首地址）然后再转换成其他数据类型（比如把char*转成某种struct*，亦或把某种struct*转成char*）。
+
+（二）复合数据类型
+0 指针：详见上面“地址及指针类型”。
+
+1 数组
+（0）概念：如同指针类型是由指针和指针所指向的数据类型复合而成的，数组是由数组本身和数组元素的数据类型复合而成的
+（1）声明、定义、初始化
+int a[] = {0, 1, 2, 3, 4, 5, 6. 7, 8, 9};   // 在c和cpp里，都不能int[10] a = {0, 1, 2, 3, 4, 5, 6. 7, 8, 9};这么定义数组，Java可以，不要弄混！
+若初始化，可以不写元素个数（数组长度）；不初始化，必须写上数组长度！ 
+（2）使用
+a 下标法；
+b 指针法：数组名是一个指向了自己的特殊指针变量，移动位移为1而不是元素数据类型的长度；
+（3）二维数组：理解一件事就行，一维数组名是一级指针，二维数组名是二级指针。
+（4）变长数组
+我们上面定义的int a[] = {0, 1, 2, 3, 4, 5, 6. 7, 8, 9};这种数组是在栈上定义的，
+你当然可以在堆上定义数组，并且实现一个变长数组即动态数组，
+但是C语言为我们提供了在栈上定义变长数组的规则，这一点要明确，我们可以使用像下面这样定义数组：
+#include <stdio.h>
+#include <string.h>
+void processString(const char *input) {
+    char arr[strlen(input) + 1];  // +1 用于存放字符串结束符 '\0'
+    strcpy(arr, input);
+    printf("你输入的字符串是：%s\n", arr);
+}
+int main() {
+    char input[100];  // 假设最大输入长度为99个字符
+    printf("请输入一个字符串：");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0';
+    processString(input);
+    return 0;
+}
+
+2 字符串（C语言和其他语言最不同的地方就在这了，高级语言都有专门的字符串类型，但是C语言是没有的而只有字符数据类型）
+（0）概念：作为一种复合数据类型，是指针或数组和字符的结合。
+（1）结束标志：一个字符串以“\0”为结束标志。
+（2）地位：最常见数据类型，在任何语言中都是。
+（3）从内存角度理解三种不同的字符串（首先，"hello"我们把他叫字符串字面值，它本来就是常量，本来就在常量区）
+a 常量区：
+char* str = "hello";   // 如果你修改，编译时不会报错，但是运行时会出现段错误，因而一般我们都这样定义：const char* str = "hello";，这样定义在编译时就会报错，以避免程序员的误操作，另外要区分：char* const str = "hello";，这是在定义常指针而非字符串常量。
+b 栈区（就是定义字符数组）：
+char str_var1[] = {' ', 'w', 'o', 'r', 'l', 'd', '!', '\0'};   // 必须写上'\0'，系统不会为这种定义出来的字符串添加'\0'
+char str_var2[] = {" world!"};   // 不常见
+char str_var3[] = " world!";   // 定义字符数组的主要方式，这里其实就是我们将一个字符串字面值复制到了栈上，这个字面值在常量区是存在的
+c 堆区：
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+int main() {
+  char* str_var = (char*)malloc(100);
+  memset((void*)str_var, '\0', 100);
+  char* str_hw = (char*)memcpy((void*)str_var, "hello world!", strlen("hello world!"));
+  *(++str_hw) = '0';
+  printf("Can str_var be altered? ------- %s\n", str_var);
+  return 0;
+}
+（4）字符串长度问题汇总
+a 不管你加不加\0，都会给你加上。
+#include <stdio.h>
+#include <string.h> 
+int main() {
+        printf("string' length is %ld (sizeof)\n", sizeof("hello"));   // 6
+        printf("string' length is %ld (sizeof with \\0)\n", sizeof("hello\0"));   // 7
+        return 0;
+}
+因而，我们最好不要自己加，因为反正都会给我们加。
+b 两种长度
+无'\0'长度（这就是字符串长度）：strlen(字符串)
+有'\0'长度（字符串内存长度）：strlen(字符串) + 1 == sizeof(字符串字面值)
+c 切记不要使用sizeof去测算任何字符串类型而不管它是使用哪一种方式定义出来的，因为测出来的不一定真实的字符串长度。
+用sizeof测字符串字面值，得到的是：strlen(字符串) + 1
+用sizeof测字符串常量，得到的是：指针类型长度（指针类型长度永远为8）。
+用sizeof测字符数组，得到的是：strlen(字符串) + 1
+用sizeof测堆区字符串，得到的是：指针类型长度（指针类型长度永远为8）。
+（5）经验之谈：在实际工作中，我们经常会申请一片比最大字符串长度大1的内存空间，先全部置为“\0”，然后进行存取，以免出现溢出。
+（6）常用库函数：这个很重要，强调一下，请见库。
+
+
+
+（三）构造数据类型
+1 结构体
+（1）概念：经典的复合数据类型，就是把其他类型作为结构的一个字段。
+（2）声明、定义、初始化
+a 声明：
+第一种方式：
+struct Point {
+    int x;
+    int y;
+};
+第二种方式：
+typedef struct {
+    int x;
+    int y;
+} Point;
+b 定义和初始化：
+第一种方式（栈区）：
+struct Point p1 = {10, 20};  // 直接初始化
+struct Point p2; // 间接初始化
+p2.x = 10;
+p2.y = 20;
+第二种方式（堆区）：
+Point* p = (Point*)malloc(sizeof(Point));
+p->x = 70;  // 使用箭头操作符访问成员
+p->y = 80;
+free(p4);   // 记得在不需要的时候释放内存
+（3）内存对齐
+#include <stdio.h>
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+}Data1;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+}Data2;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char c;   // 1
+}Data3;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char c;   // 1
+}Data4;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char s[9];   // 9
+}Data5;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char s[7];   // 7
+}Data6;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char s[9];   // 9
+}Data7;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char s[7];   // 7
+}Data8;
+int main() {   // 以下输出结果是在x64环境
+        printf("4 8 : %ld\n", sizeof(Data1));   // 16
+        printf("8 4 : %ld\n", sizeof(Data2));   // 16
+        printf("4 8 1 : %ld\n", sizeof(Data3));   // 24
+        printf("8 4 1 : %ld\n", sizeof(Data4));   // 16
+        printf("4 8 9 : %ld\n", sizeof(Data5));   // 32
+        printf("4 8 7 : %ld\n", sizeof(Data6));   // 24
+        printf("8 4 9 : %ld\n", sizeof(Data7));   // 24
+        printf("8 4 7 : %ld\n", sizeof(Data8));   // 24
+        return 0;
+}
+（4）柔性数组
+a 柔性数组在结构体中的位置：结构中的柔性数组成员前面必须至少一个其他成员且只能放在结构体的最后面；
+b 大小问题：sizeof(含有柔性数组的结构)的返回值不计算柔性数组的内存，或者说柔性数组的内存可以认为成0；
+d 柔性数组的两种定义方式：
+int ra[];
+int ra[0];
+e 定义问题：包含柔性数组成员的结构只能用malloc()函数进行定义；
+f 用途：在网络编程中极其重要，协议包格式一般使用一个包含柔性数组的结构体声明，柔性数组之前是协议头，柔性数组是payload。
+
+
+
+2 共用体：一句话理解共用体：共用体的内存大小是最大成员的内存大小且所有成员共用一个首地址。
+
+3 函数
+（0）概念：
+a 实际上我们一般不说函数是数据类型，但是函数本身是一种在栈上分配内存的构造数据类型，相比于结构体这样的典型的数据类型，函数的特殊之处在于，它是被调用而不是像结构体、类一样用作实例化对象。
+b 函数到底是个什么？编程语言中的函数概念要比数学中的函数概念更加宽泛，但是二者本质并无差别，都是由三要素构成：输入、处理、输出，比如y = x + 1这是一个函数，x = 1是输入，x + 1是处理方法，y = 2是输出。
+（2）函数三要素
+a 参数：是局部变量
+b 函数体：算法
+c 返回值：只能返回一个值
+（3）和指针的结合：
+a 传出参数：解决只能返回一个值的情况，且提供用户接口，用途相当广泛。
+b 指针性函数：返回值是一个指针，注意不要返回局部变量的地址，会造成野指针。
+c 函数指针变量：
+（a）函数名和数组名同理；
+（b）用途：
+大名鼎鼎的回调函数，给函数传函数；
+动态调用机制，增加灵活性，也是多态的实现基础。
+（c）定义方式：
+在函数内定义：返回类型 (*指针变量名)(参数类型1, 参数类型2, ...);   // 指针型函数的原型是：返回类型 *指针变量名(参数类型1, 参数类型2, ...);
+在函数外定义：typedef 返回类型 (*指针变量名)(参数类型1, 参数类型2, ...);
+
+4 类：详见cpp。
+
+
+
+
+
+
+
+三 存储
+（零）首先要对进程内存模型图有个基本认识。
+
+
+
+（一）三大概念
+1 作用域（无非就是函数外和函数内）
+（1）只要这个数据是在函数内定义的而不管它是栈上还是堆上，那么它的作用域就是函数体；
+（2）在函数func外定义的数据对func函数来说作用域是全局的。
+
+2 生存期（大看栈堆小看static）
+（1）栈上定义的非static数据生存期从被定义到函数运行结束，static数据的生存期从被定义到进程终止；
+（2）堆上定义的由于是指针，一般不用static修饰，其生存期从被定义到被释放，进程终止时os会回收没有释放的堆数据，但是对于服务器开发而言，由于服务器进程不会终止所以必须手动free。
+
+3 可变性：
+（1）使用const修饰的数据作为常量不可再被更改，如果更改编译时就会报错；
+（2）因此这样的数据必须被初始化；
+（3）使用char*修饰的字符串也是常量，因而在C语言中，字符数组和字符串是不一样的，这一点尤为重要。

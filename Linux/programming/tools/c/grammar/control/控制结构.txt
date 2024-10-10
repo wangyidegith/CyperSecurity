@@ -1,0 +1,60 @@
+零 顺序结构：先做什么后做什么。
+
+
+
+
+
+
+
+一 分叉结构：if-else-else if，switch-case-default
+
+
+
+
+
+
+
+二 循环结构：for、while、do-while
+
+
+
+
+
+
+
+注：分叉和循环结构的问题都在于分清楚真假，里面为真，外面为假。
+
+
+
+
+
+
+
+三 break、continue、goto
+（一）经典问题：如果有多层循环，break和continue跳出的是哪层循环？最内层。
+
+
+
+（二）goto
+1 作用：无条件跳转到任何地方。
+
+2 语法：
+#include <stdio.h>
+
+int main() {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (j == 1) {
+                goto end;  // 跳到 end 标签
+            }
+            printf("i=%d, j=%d\n", i, j);
+        }
+    }
+
+    end:
+    printf("Exited the loops.\n");
+    
+    return 0;
+}
+
+3 注意：尽量往后面跳不要往前面跳。
