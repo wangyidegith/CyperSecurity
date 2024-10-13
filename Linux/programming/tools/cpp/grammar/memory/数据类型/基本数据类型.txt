@@ -1,0 +1,67 @@
+基本数据类型
+一 15种基本数据类型（不包括enum）
+`
+#include <stdio.h>
+#include <stddef.h>  // 包含 ptrdiff_t 的定义
+int main() {
+/* 
+一 signed、unsigned、无修饰：
+    1 这三种所占空间不变。
+
+    2 无修饰取决于编译器，而编译器一般是signed。
+
+二 long可以用来区分x86和x64，x86下long是4B，x64下是8B，注意long long都是8B。
+
+三 除了long，x86和x64的核心区别在于：指针的长度。
+
+四 ptrdiff_t 是一个标识指针插值的数据类型（其实就是指针类型）。
+
+五 wchar_t 经测试再x64下是4B。
+
+六 _t 一般不说它是基本数据类型了而是加工数据类型，但其实本质上还是基本数据类型只是换了名字。
+*/
+    printf("Size of char: %zu byte(s)\n", sizeof(char));
+    printf("Size of unsigned char: %zu byte(s)\n", sizeof(unsigned char));
+    printf("Size of short: %zu byte(s)\n", sizeof(short));
+    printf("Size of unsigned short: %zu byte(s)\n", sizeof(unsigned short));
+    printf("Size of int: %zu byte(s)\n", sizeof(int));
+    printf("Size of unsigned int: %zu byte(s)\n", sizeof(unsigned int));
+    printf("Size of long: %zu byte(s)\n", sizeof(long));
+    printf("Size of unsigned long: %zu byte(s)\n", sizeof(unsigned long));
+    printf("Size of long long: %zu byte(s)\n", sizeof(long long));
+    printf("Size of unsigned long long: %zu byte(s)\n", sizeof(unsigned long long));
+    printf("Size of float: %zu byte(s)\n", sizeof(float));
+    printf("Size of double: %zu byte(s)\n", sizeof(double));
+    printf("Size of long double: %zu byte(s)\n", sizeof(long double));
+    printf("Size of wchar_t: %zu byte(s)\n", sizeof(wchar_t));
+    printf("Size of ptrdiff_t: %zu byte(s)\n", sizeof(ptrdiff_t));
+
+    return 0;
+}
+`
+
+
+
+
+
+
+
+二 enum
+（1）如何声明、定义、初始化？和struct一样。
+（2）如何使用？这和struct可不一样，它必须使用enum声明的字段给enum变量赋值。
+（3）本质：
+a 每个字段就是整型；
+b 有默认值，比如enum color { red, green=5, blue };，那么red还是0，由于green被初始化成了5，blue的值是6。
+
+
+
+
+
+
+
+三 void
+（1）概念：无数据类型。
+（2）用处：
+a 函数返回值；
+b 函数参数；
+c 和指针结合，进行强制类型转换，这也是强制类型转换的核心用法：即你可以设置一根void*指针用来接收任何数据类型的指针变量（反正对于指针而言都是去拿首地址）然后再转换成其他数据类型（比如把char*转成某种struct*，亦或把某种struct*转成char*）。

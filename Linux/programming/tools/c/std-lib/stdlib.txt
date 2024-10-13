@@ -1,0 +1,240 @@
+一 变量
+1 size_t：sizeof运算符的返回结果，其实是%ld，但一般用%zu表示。
+
+2 wchar_t：宽字节数据类型，经测试是4B。
+
+3 div_t：div函数的返回结果
+typedef struct {
+    int quot;  // 商
+    int rem;   // 余数
+} div_t;
+
+4 ldiv_t：ldiv函数的返回结果
+typedef struct {
+    long quot;  // 商
+    long rem;   // 余数
+} ldiv_t;
+
+
+
+
+
+
+
+二 宏
+1 NULL：空指针，表示该指针指向为空，其实是(void*)0，这是进程内存模型中的保留地址，常用于初始化未指向指针变量，一个指针变量如果没有指向，那么它的值时随机的，这是危险的野指针，使用NULL将其控制在保留区域，这是非常好的编程习惯。
+
+2 EXIT_FAILURE：用作exit的传出参数status，表示进程失败退出，一般为1，实际上我们在日常工作中更乐意用-1表示一个函数的失败。
+
+3 EXIT_SUCCESS：用作exit的传出参数status，表示进程成功退出，一般为0。
+
+4 RAND_MAX：rand函数可返回的最大随机数。
+
+5 MB_CUR_MAX：多字节字符集的最大字符数，在本文档中不强调多字节。
+
+
+
+
+
+
+
+三 函数
+（一）字符串转数字类型：一个实际情况是我们经常需要进行unsigned short类型（端口号的类型）和字符串的互转。
+1 unsigned short -> str
+char* unsignedShortToStr(const unsigned short value, char* str) {
+    if (str) {
+        snprintf(str, (size_t)snprintf(NULL, 0, "%hu", value) + 1, "%hu", value);
+    }
+    return str;
+}
+
+2 str -> unsinged short
+unsigned short strToUnsignedShort(const char* str) {
+    int value = atoi(str);
+    if (value) {
+        return (unsigned short)value;
+    }
+    return -1;
+}
+
+
+
+（二）C语言内存管理的四大金刚：malloc、calloc、realloc、free。
+1 
+人家的参数都是void*、size_t，请对自己严格一点，做好强制类型转换。
+人家的返回值都是成功返回指针，失败返回NULL。
+
+2 malloc和free是一对千年老搭档。
+
+3 calloc 和 malloc 之间的不同点是，malloc 不会设置内存为零，而 calloc 会设置分配的内存为零，所以应该尽量用calloc以免自己忘了`memset((void*)str, 0x00, strlen(str) + 1);`。
+
+4 realloc：void* realloc(void* old_ptr, size_t size);
+（1）返回值：
+成功返回new_ptr，这个new_ptr和old_ptr的对比详见（2）；
+失败返回NULL，注意old_ptr指向的内存不会被free。
+（2）新旧内存：new_ptr指向的内存可能和old_ptr指向的内存相同也可能不同
+如果新申请的内存大小在原内存基础上能扩展（所谓能扩展就是连续内存够用）的话，那么new_ptr和old_ptr指向的内存相同，这是最好的情况；
+如果不能扩展即连续内存不够用不得不另辟内存区，那么new_ptr和old_ptr指向的内存不相同，这种情况下：old_ptr指向的内存区会被free，如果还有其他ptr指向了这里，那么会造成野指针。
+（3）这一点很重要：不管是返回NULL，还是返回原区或新区，对用户而言，你都需要free掉realloc之后的内存，这是合理的，因为用户申请了内存自然得让他free。
+（4）一些特殊情况：
+a old_ptr == NULL：== malloc
+b size == 0：== free
+
+
+
+（三）退出函数
+1 void abort(void);
+（1）核心转储文件（目前没有找到）：abort 函数用于立即终止程序执行，并产生一个核心转储文件。
+（2）注意：使用 abort 函数时，不会执行任何 atexit 注册的函数或对象析构函数。
+（3）用途：通常用于在检测到不可恢复的错误时终止程序。
+
+2 void exit(int status);
+status：
+可以是EXIT_FAILURE或EXIT_SUCCESS；
+可以是数字。
+
+3 int atexit(void (*func)(void));
+（0）这是一个注册函数：注册exit时执行的函数。
+（1）返回值：成0败-1。
+（2）参数：exit时执行的函数。
+（3）功能：C语言的析构。
+
+
+
+（四）环境变量
+0 extern char** environ;   // 系统环境变量表，和env命令获得的一样，k-v形式
+
+1 char* getenv(const char* name);
+参数是k，返回是v。
+
+2 int setenv(const char* name, const char* value, int overwrite);
+（1）返回值：成0败-1。
+（2）参数：overwrite：0表示不能覆盖，非0表示可以覆盖。
+
+3 int unsetenv(const char* name);
+
+
+
+（五）system函数：这就是最被杀软关注的函数了。
+
+
+
+（六）计算函数
+1 绝对值：
+（1）int abs(int x);
+（2）long int abs(long int x);
+
+2 除法：
+（0）/ 只能得到商而不能得到余数。
+（1）div_t div(int numer, int denom);
+（2）ldiv_t ldiv(long int numer, long int denom);
+
+
+
+（七）随机数
+0 理解：计算机是否能产生真正的随机数？答案是不能。
+
+1 int rand(void);   // 可以在0-RAND_MAX之间随机产生一个数字，但是这是一个系统给你的固定数字，你多次运行还是重新编译再运行都是这个数字。
+示例：
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int main()
+{
+  printf("%d\n", rand());
+  return(0);
+}
+
+`
+
+2 void srand(unsigned int seed);   // 在rand之前执行，rand每次调用会产生不同数字，但是你多次运行还是重新编译再运行也都是这些数字。
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int main()
+{
+   int i, n;
+   n = 5;
+   srand((unsigned int)123456789);
+   for( i = 0 ; i < n ; i++ ) {
+      printf("%d\n", rand() % 50);
+   }
+
+  return(0);
+}
+`
+
+注：上面的两个例子证明了计算机是没法产生随机数的，只能产生伪随机数。
+
+3 
+#include <time.h>
+time_t time(time_t *seconds);   // time_t是“自 1970 年 1 月 1 日 00:00:00 UTC 开始的秒数”，可以返回可以传出；借助time函数随机起来，使用作为seed是C语言产生随机数的最常见的做法，实际上也能使用其他的总之使用总是在变的就行。
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+int main()
+{
+   int i, n;
+   time_t t;
+   n = 5;
+   srand((unsigned) time(&t));
+   for( i = 0 ; i < n ; i++ ) {
+      printf("%d\n", rand() % 50);
+   }
+  return(0);
+}
+`
+
+
+（八）基本算法库函数
+0 排序和查找是最基本的两种算法，事实上有很多算法，C语言提供了两种常用的。
+
+1 排序：qsort
+`
+#include <stdio.h>
+#include <stdlib.h>
+int values[] = { 88, 56, 100, 2, 25 };
+int cmpfunc (const void * a, const void * b)   // 其作用在于告诉qsort是降序还是升序，a-b是升序，b-a是降序
+{
+   return ( *(int*)a - *(int*)b );
+}
+int main()
+{
+   int n;
+   printf("排序之前的列表：\n");
+   for( n = 0 ; n < 5; n++ ) {
+      printf("%d ", values[n]);
+   }
+   qsort(values, 5, sizeof(int), cmpfunc);   // 没有返回值
+   printf("\n排序之后的列表：\n");
+   for( n = 0 ; n < 5; n++ ) {
+      printf("%d ", values[n]);
+   }
+   return 0;
+}
+`
+
+2 查找：bsearch（二分查找）
+`
+#include <stdio.h>
+#include <stdlib.h>
+int cmpfunc(const void * a, const void * b) {   // 二分查找是要先排序的
+    return (*(int*)a - *(int*)b);
+}
+int main() {
+    int values[] = { 5, 20, 29, 32, 63 };
+    int key = 32;
+    int *item;
+    size_t array_size = sizeof(values) / sizeof(values[0]);
+    item = (int*) bsearch(&key, values, array_size, sizeof(int), cmpfunc);   // 找见返回指向该值的指针，找不见返回NULL
+    if (item != NULL) {
+        printf("Found item = %d\n", *item);
+    } else {
+        printf("Item = %d could not be found\n", key);
+    }
+    return 0;
+}
+`

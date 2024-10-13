@@ -1,0 +1,107 @@
+零 概念
+1 定义：多态性是一种允许使用一个接口来定义多种不同实现的方法。
+
+2 分类：
+（1）编译时多态。
+（2）运行时多态。
+
+
+
+
+
+
+
+一 编译时多态
+（一）函数重载
+1 函数名相同。
+
+2 参数不同：
+（1）类型、个数、顺序，任一不同就可以构成重载。
+（2）参数名、默认值不同不能构成重载。
+
+3 返回值无所谓。
+
+
+
+（二）运算符重载
+1 语法：
+返回类型 operator运算符(参数列表)
+{
+    // 函数体
+}
+
+2 用法：
+`
+#include <iostream>
+class MyClass {
+private:
+    int value;
+public:
+    MyClass(int val = 0) : value(val) {}
+    // 加法运算符重载
+    MyClass operator+(const MyClass& other) const {   // 运算符重载函数的特点：由于一般要操作对象，所以参数总是"const MyClass& other"这种形式。
+        return MyClass(value + other.value);   // 运算符重载函数的特点：由于一般要返回对象，所以总是返回一个构造函数。
+    }
+    void display() const {
+        std::cout << "Value: " << value << std::endl;
+    }
+};
+int main() {
+    MyClass obj1(10);
+    MyClass obj2(20);
+    MyClass obj3 = obj1 + obj2;
+    obj3.display();
+    return 0;
+}
+
+
+
+
+
+
+
+二 运行时多态（动态绑定）
+（一）虚函数
+`
+#include <iostream>
+class Base {
+public:
+    virtual void show() {   // 虚函数
+        std::cout << "Base class show function called." << std::endl;
+    }
+};
+class Derived : public Base {
+public:
+    void show() override {
+        std::cout << "Derived class show function called." << std::endl;
+    }
+};
+int main() {
+    Base *bptr;
+    Derived d;
+    bptr = &d;
+    bptr->show();  // 动态绑定发生在这里，像回调函数一杠提供一样统一接口
+    return 0;
+}
+`
+
+
+
+（二）纯虚函数
+0 语法
+`
+class Base {
+public:
+    virtual void show() = 0; // 纯虚函数
+};
+`
+
+1 纯虚函数的特点：
+（1）没有函数体。
+（2）纯虚函数所在的类叫抽象类（民间叫法：接口类）：至少有一个纯虚函数的类。
+
+2 抽象类的特点：
+（1）可以定义多个纯虚函数；
+（2）可以定义其他任何cpp 类可以定义的成员；
+（3）不能实例化，这是最重要的一点。
+（4）如果一个类继承了抽象类而没有重写纯虚函数，那么该类还是抽象类。

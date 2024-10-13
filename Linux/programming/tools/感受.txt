@@ -1,3 +1,4 @@
+一 对编程语言的感受
 0 语言是工具。
 
 1 C语言是一切高级语言的基础，也是低级语言（机器语言、汇编语言）向高级语言的过渡，因而在学习语言的过程中掌握该语言是最重要的事情。
@@ -8,4 +9,39 @@
 
 4 学习一门编程语言无非是学习：语法、工具链（编译、编辑、调试）、库。
 
+
+
+
+
+
+
+二 c/cpp编程的接口函数的核心设计原则（最小责任原则）：让用户去new和delete而不是用户new我delete或我new用户delete。
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+char* unsignedShortToStr(const unsigned short value, char* str) {   // 提供一个传出参数，让用户负责申请str的内存并传给我，另外不要给这个缓冲区做任何多余操作比如置0什么的，因为那是用户的责任
+    if (str) {
+        snprintf(str, (size_t)snprintf(NULL, 0, "%hu", value) + 1, "%hu", value);
+    }
+    return str;
+}
+int main() {
+    unsigned short num = 12345;
+    char* str = (char*)malloc(6);
+    // TODO: set str to 0
+    str = unsignedShortToStr(num, str);
+    printf("unsigned short to string: %s\n", str);
+    free(str);
+    return 0;
+}
+`
+
+
+
+
+
+
+
+三 句柄：有的类或结构没有必要暴露给用户其实例又必须在函数声明里用到，那么就可以将这种类或结构隐藏并在.h里声明，这就是句柄。
 

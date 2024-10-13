@@ -1,0 +1,112 @@
+一 概念：经典的复合数据类型，就是把其他类型作为结构的一个字段。
+
+
+
+
+
+
+
+二 声明、定义、初始化
+（一）声明：
+1 第一种方式：
+struct Point {
+    int x;
+    int y;
+};
+
+2 第二种方式：
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+
+
+（二）定义和初始化：
+1 第一种方式（栈区）：
+struct Point p1 = {10, 20};  // 直接初始化
+struct Point p2; // 间接初始化
+p2.x = 10;
+p2.y = 20;
+2 第二种方式（堆区）：
+Point* p = (Point*)malloc(sizeof(Point));
+p->x = 70;  // 使用箭头操作符访问成员
+p->y = 80;
+free(p4);   // 记得在不需要的时候释放内存
+
+
+
+
+
+
+
+三 内存对齐
+#include <stdio.h>
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+}Data1;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+}Data2;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char c;   // 1
+}Data3;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char c;   // 1
+}Data4;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char s[9];   // 9
+}Data5;
+typedef struct {
+        int i;   // 4
+        double d;   // 8
+        char s[7];   // 7
+}Data6;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char s[9];   // 9
+}Data7;
+typedef struct {
+        double d;   // 8
+        int i;   // 4
+        char s[7];   // 7
+}Data8;
+int main() {   // 以下输出结果是在x64环境
+        printf("4 8 : %ld\n", sizeof(Data1));   // 16
+        printf("8 4 : %ld\n", sizeof(Data2));   // 16
+        printf("4 8 1 : %ld\n", sizeof(Data3));   // 24
+        printf("8 4 1 : %ld\n", sizeof(Data4));   // 16
+        printf("4 8 9 : %ld\n", sizeof(Data5));   // 32
+        printf("4 8 7 : %ld\n", sizeof(Data6));   // 24
+        printf("8 4 9 : %ld\n", sizeof(Data7));   // 24
+        printf("8 4 7 : %ld\n", sizeof(Data8));   // 24
+        return 0;
+}
+
+
+
+
+
+
+
+四 柔性数组
+1 柔性数组在结构体中的位置：结构中的柔性数组成员前面必须至少一个其他成员且只能放在结构体的最后面；
+
+2 大小问题：sizeof(含有柔性数组的结构)的返回值不计算柔性数组的内存，或者说柔性数组的内存可以认为成0；
+
+3 柔性数组的两种定义方式：
+int ra[];
+int ra[0];
+
+4 定义问题：包含柔性数组成员的结构只能用malloc()函数进行定义；
+
+5 用途：在网络编程中极其重要，协议包格式一般使用一个包含柔性数组的结构体声明，柔性数组之前是协议头，柔性数组是payload。

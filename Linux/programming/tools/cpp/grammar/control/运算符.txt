@@ -1,3 +1,5 @@
+零 和C语言的区别：类型转换运算符中，cpp比C语言多了一个cast运算符。
+
 一 算术运算符：
 （一）基本：+ - * / % ++ --
 
@@ -191,7 +193,22 @@ b = (a == 1) ? 20: 30;   // 前真后假
 
 
 
-（六）类型转换运算符
+（六）类型转换运算符：
+0 c风格，但是cpp不希望用户使用c风格。
+
+1 cast
+（1）static_cast
+用于对象的上行转换，这是最安全的情况也是默认的情况，其实用到转换，就是强制的，就是会产生不安全问题的，但是只要程序员心里有数那就不会造成问题。
+（2）dynamic_cast
+用于对象的下行转换。
+（3）const_cast
+const int a = 10;   // 声明一个 const 整数 a，值为 10
+int* b = const_cast<int*>(&a);  // 使用 const_cast 移除 const 属性
+int a = 10;   // 声明一个整数 a，值为 10
+const int* c = const_cast<const int*>(&aa)   // 使用 const_cast 添加const属性
+（4）reinterpret_cast
+用于进行低级别的、不安全的类型转换；
+通常用于指针类型之间的转换。
 
 
 

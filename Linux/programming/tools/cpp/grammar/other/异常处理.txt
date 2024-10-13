@@ -1,0 +1,85 @@
+一 语法
+1 
+`
+#include <iostream>
+#include <stdexcept>
+int main() {
+    try {   // == if
+        int age = 15;
+        if (age < 18) {
+            throw std::runtime_error("未满18岁，无法访问");   // 把异常仍出去，== return -1
+        }
+        std::cout << "访问被允许" << std::endl;
+    }
+    catch (const std::runtime_error& e) {   // 捕获到异常，就近原则
+        std::cerr << "捕获到异常: " << e.what() << std::endl;
+    }
+    return 0;
+}
+`
+
+2 这个例子体现异常可以传递
+`
+void func2() {
+    throw std::runtime_error("异常在func2中抛出");
+}
+void func1() {
+    try {
+        func2();
+    }
+    catch (const std::runtime_error& e) {
+        std::cerr << "在func1中捕获异常: " << e.what() << std::endl;
+    }
+}
+int main() {
+    try {
+        func1();
+    }
+    catch (...) { // 使用...可以捕获所有类型的异常
+        std::cerr << "在main中捕获到未处理的异常" << std::endl;
+    }
+    return 0;
+}
+`
+
+
+
+
+
+
+
+二 cpp 标准异常类：在C++标准库中，<stdexcept> 头文件定义了一系列常用的异常类，这些类都是 std::exception 的派生类。以下是一些常用的异常类：
+0 ...
+表示捕获任何异常。
+
+1 std::exception
+这是所有标准异常类的基类，提供了一个 what() 成员函数，返回一个描述异常的C字符串。
+
+2 std::bad_alloc
+当动态内存分配失败时，new 操作符会抛出这个异常。
+
+3 std::bad_cast
+当使用 dynamic_cast 进行类型转换失败时抛出。
+
+4 std::bad_typeid
+当对 typeid 运算符应用于一个空指针时抛出。
+
+5 std::logic_error
+表示程序中的逻辑错误，是几个其他异常类的基类。
+（1）std::domain_error
+当使用一个函数或对象时参数不在定义域内时抛出。
+（2）std::invalid_argument
+当传递给函数的参数无效时抛出。
+（3）std::length_error
+当试图创建一个超出该类型最大长度的对象时抛出。
+（4）std::out_of_range
+当使用一个序列（如 std::vector 或 std::string）的索引或迭代器超出范围时抛出。
+
+6 std::runtime_error
+表示在运行时发生的错误，是几个其他异常类的基类。
+（1）std::range_error
+当使用了一个超出函数定义范围的值时抛出。
+（2）std::overflow_error
+当算术运算的结果超出了类型的表示范围时抛出。
+（3）std::underflow_error
+当算术运算的结果太小而无法用类型表示时抛出。

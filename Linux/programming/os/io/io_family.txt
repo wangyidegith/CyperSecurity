@@ -1,5 +1,5 @@
 5对函数（详见《Linux网络编程》245页表9.8）
-除了我们非常熟悉的Linux标准IO函数read/write以外，还有一种专门用于套接口的IO函数：reacv和send，这一对函数还可以指定flag；
+除了我们非常熟悉的Linux标准IO函数read/write以外，还有一种专门用于套接口的IO函数：recv和send，这一对函数还可以指定flag；
 readv/writev是read/write的多缓冲区升级版，recvmsg/sendmsg是recv/send的多缓冲区升级版，另外recvmsg/sendmsg封装了iovec，增加了一些其他信息比如远端地址；
 除了上面四对函数以外，还剩下：recvfrom/sendto，这两个函数相比recv/send，主要的升级是可以指定远端地址，另外recvmsg/sendmsg也是可以指定远端地址的。
 

@@ -1,0 +1,80 @@
+零 C语言的预处理指令统一以#开头。
+
+
+
+
+
+
+
+一 作用
+（一）文件包含
+0 语法：#include 文件
+注：标准库文件使用<>，自定义文件使用""。
+
+
+
+（二）宏定义
+1 定义宏：#define 宏名 实际名
+
+2 取消宏：#undef 宏名
+
+
+
+（三）条件编译（其实能做很多事情不光是编译）
+1 #ifdef
+
+2 #ifndef
+
+3 #if
+
+4 #elif
+
+5 #else
+
+6 #endif
+
+
+
+（四）其它指令
+1 #line
+#include <stdio.h>
+void example() {
+    printf("This is an example function.\n");
+}
+#line 100 "newfile.c"
+void another_example() {   // 对于编译器而言，该函数在newfile.c的100行
+    printf("This function is in newfile.c at line 100.\n");
+}
+
+2 #error
+#include <stdio.h>
+// 定义一个宏以指示是否启用某个功能
+#define FEATURE_X_ENABLED 0
+#if FEATURE_X_ENABLED == 0
+#error "FEATURE_X must be enabled to compile this code."
+#endif
+int main() {
+    printf("This code will not compile if FEATURE_X_ENABLED is 0.\n");
+    return 0;
+}
+
+3 #progma
+注：该指令是和编译器的具体实现相关的。
+（1）#grogma once：只包含一次，相当于（下面这个可以更细化）：
+#ifndef FUNC_H  // 如果没有定义 FUNC_H
+#define FUNC_H  // 定义 FUNC_H
+// 函数声明
+void hello();
+#endif // FUNC_H  // 结束条件
+（2）设置结构体对齐方式
+#pragma pack(push, 1)  // 设置结构体对齐为1字节
+struct MyStruct {
+    char a;
+    int b;
+};
+#pragma pack(pop)     // 恢复默认对齐
+（3）链接控制
+（4）优化控制
+#pragma optimize("", off) // 关闭优化
+// 代码段
+#pragma optimize("", on)  // 恢复优化

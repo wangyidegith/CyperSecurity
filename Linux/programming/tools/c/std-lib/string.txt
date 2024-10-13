@@ -1,12 +1,14 @@
-注：在认识常用函数之前，先说清楚一件事：<string.h>的所有函数都不管'\0'！
+注：
+1 <string.h>的所有函数都不管'\0'！
+
+2 能用mem尽量用mem而不要用str，就算用str也用strn。
 
 
 
 
 
 
-
-1 测定字符串长度：
+一 测定字符串长度
 函数原型：size_t strlen(const char *str);
 
         返回值：无符号长整型（%ld）
@@ -19,7 +21,7 @@
 
 
 
-2 字符串复制函数：（注意：dest要大于等于src，要不会造成内存溢出）
+二 字符串复制函数：（注意：dest要大于等于src，要不会造成内存溢出）
 函数原型：char* strcpy(char* dest, const char* src);
 
         返回值：指向了dest的指针
@@ -27,6 +29,7 @@
         参数：dest        目标内存
 
                    src        源字符串
+
 
 
 函数原型：char* strncpy(char* dest, const char* src, size_t n);
@@ -40,8 +43,9 @@
                    n        要从src复制的字符数
 
 
-函数原型：void* memcpy(void* dest, const void* src, size_t n);
 
+函数原型：void* memcpy(void* dest, const void* src, size_t n);
+咱们用它就行。
         返回值：指向了dest的指针
 
         参数：dest        目标内存
@@ -49,6 +53,7 @@
                    src        源字符串
 
                    n        要从src复制的字符数
+
 
 
 函数原型：void* memmove(void* dest, const void* src, size_t n);
@@ -63,11 +68,16 @@
 
 
 
+注：在重叠内存块这方面，memmove() 是比 memcpy() 更安全的方法。
+如果目标区域和源区域有重叠的话，memmove() 能够保证源串在被覆盖之前将重叠区域的字节拷贝到目标区域中。如果目标区域与源区域没有重叠，则和 memcpy() 函数功能相同。
 
 
 
 
-3 字符串比较函数：
+
+
+
+三 字符串比较函数
 函数原型：int memcmp(const void* str1, const void* str2, size_t n)
 
         返回值：如果返回值 < 0，则表示 str1 小于 str2
@@ -116,7 +126,7 @@
 
 
 
-4 字符串追加函数：（注意：dest要大于dest+src，要不会造成内存溢出）
+四 字符串追加函数：（注意：dest要大于dest+src，要不会造成内存溢出）
 函数原型：char* strcat(char* dest, const char* src);
 
         返回值：指向了dest的指针
@@ -142,7 +152,7 @@
 
 
 
-5 字符串置同一字符函数：（该函数可以将字符串的前n个字符都置为同一字符，我们经常使用到的置0操作便是使用该函数）
+五 字符串置同一字符函数：（该函数可以将字符串的前n个字符都置为同一字符，我们经常使用到的置0操作便是使用该函数）
 函数原型：void* memset(void* str, int c, size_t n)
 
         返回值：指向了str的指针
@@ -152,3 +162,115 @@
                    c        字符
 
                    n        要被设置为c的前多少个字符
+
+
+
+
+
+
+
+六 char* strerror(int errnum);
+`
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+int main ()
+{
+   FILE *fp;
+   fp = fopen("file.txt","r");
+   if( fp == NULL ) 
+   {
+      printf("Error: %s\n", strerror(errno));   // == perror("Error: "); 但是strerror能拿到字符串为自己用。
+   }
+  return(0);
+}
+`
+
+
+
+
+
+
+
+七 检索某个字符第一次和最后一次出现的位置
+（一）第一次：void* memchr(const void* str, int c, size_t n); == strchr
+`
+#include <stdio.h>
+#include <string.h>
+int main ()
+{
+   const char str[] = "hello world";
+   const char ch = ' ';
+   char* ret;
+   ret = (char*)memchr(str, ch, strlen(str));
+   printf("|%c| 之后的字符串是 - |%s|\n", ch, ret);   // ret == " world"
+   return(0);
+}
+`
+
+
+
+（二）最后一次：char* strrchr(const char* str, int c);
+`
+#include <stdio.h>
+#include <string.h> 
+int main ()
+{
+   int len;
+   const char str[] = "hello world again";
+   const char ch = ' ';
+   char* ret;
+   ret = strrchr(str, ch);
+   printf("|%c| 之后的字符串是 - |%s|\n", ch, ret);   // ret == " again"
+   return(0);
+}
+`
+
+
+
+
+
+
+
+八 查找某个字符串在另一字符串中出现的位置
+（一）首次出现：char *strstr(const char *haystack, const char *needle);
+
+
+
+（二）最后出现：自实现
+`
+char* findLast(const char* haystack, const char* needle) {
+    char* lastOccurrence = NULL;
+    char* current = strstr(haystack, needle);
+    while (current != NULL) {
+        lastOccurrence = current; // 更新最后出现的位置
+        current = strstr(current + 1, needle); // 继续查找
+    }
+    return lastOccurrence; // 返回最后出现的指针
+}
+`
+
+
+
+
+
+
+
+九 char *strtok(char *str, const char *delim);
+`
+#include <string.h>
+#include <stdio.h>
+int main () {
+   char str[80] = "This is - www.runoob.com - website";
+   const char s[2] = "-";
+   char *token;
+   /* 获取第一个子字符串 */
+   token = strtok(str, s);
+   /* 继续获取其他的子字符串 */
+   while( token != NULL ) {
+      printf( "%s\n", token );
+      token = strtok(NULL, s);
+   }
+   return(0);
+}
+`

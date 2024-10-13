@@ -1,0 +1,140 @@
+零 
+这个库一度被认为是最常用的库，因为它可以输出程序执行的日志信息，
+但是你要明白，这个库讲的是文件的io，屏幕是一种特殊文件，
+另外该库的API你会发现基本都是POSIX文件IO系统调用的名字前面加个f，该库使用了FILE句柄以屏蔽fd细节。
+
+
+
+
+
+
+
+一 变量
+1 FILE：这是一个结构体，但是在系统上却找不到声明。
+
+2 fpos_t：也是一个结构，也找不见声明。
+
+注：像这种找不见结构的对象，叫什么？叫句柄。如果用户用不到某个类或者结构但是该类或者结构又必须出现在.h的函数声明里，那么，这就是句柄。从程序员角度看，有的类或结构没有必要暴露给用户其实例又必须在函数声明里用到，那么就可以将这种类或结构隐藏并在.h里声明。
+
+
+
+
+
+
+
+二 宏
+1 stderr、stdin 和 stdout：这些宏是指向 FILE 类型的指针，分别对应于标准错误（fd == 2）、标准输入（fd == 0）和标准输出流（fd == 1）。
+
+2 FILENAME_MAX：文件名最大长度。
+
+3 EOF：一个负整数，表示文件结尾。
+
+4 FOPEN_MAX：系统允许同时打开的文件数量。
+
+5 SEEK_CUR、SEEK_END 和 SEEK_SET
+
+
+
+
+
+
+
+三 函数
+（一）mkstemp
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+int main() {
+    char template[] = "XXXXXXX";   // 模板文件名
+    int fd = mkstemp(template);   // 创建临时文件
+    if (fd == -1) {
+        perror("mkstemp失败");
+        return EXIT_FAILURE;
+    }
+    printf("临时文件名: %s\n", template);
+    close(fd);
+    unlink(template);
+    return EXIT_SUCCESS;
+}
+`
+
+
+
+（二）void perror(const char *str);
+
+
+
+（三）FILE相关：
+open == fopen
+stat == fstat
+read/write == fread/fwrite
+remove == unlink
+rename == syscall(SYS_rename, oldpath, newpath);
+fseek == lseek
+fclose == close
+
+下面这些函数和打印函数相呼应：
+int fprintf(FILE *stream, const char *format, ...);
+int fscanf(FILE *stream, const char *format, ...);
+
+int fgetc(FILE *stream)：从流中读取一个字符。
+char *fgets(char *str, int n, FILE *stream)：从流中读取一行到字符串。
+
+
+
+（四）打印函数
+1 int printf(const char *format, ...); == int fprintf(FILE *stream, const char *format, ...);
+
+2 int sprintf(char *str, const char *format, ...);   // 高级版：int snprintf(char *str, size_t size, const char *format, ...);   // 这个高级版非常常用。
+
+3 上面三个加v。
+
+
+
+（五）扫描函数
+1 int scanf(const char *format, ...); == int fscanf(FILE *stream, const char *format, ...);
+
+2 int sscanf(const char *str, const char *format, ...);
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+   int day, year;
+   char weekday[20], month[20], dtm[100];
+   strcpy( dtm, "Saturday March 25 1989" );
+   sscanf( dtm, "%s %s %d  %d", weekday, month, &day, &year );   // 体现用法
+   printf("%s %d, %d = %s\n", month, day, year, weekday );  
+   return(0);
+}
+`
+
+
+
+（六）其他io函数
+1 输入函数（除了gets都包括换行符）
+（1）int getc(FILE *stream) == int fgetc(FILE *stream)：从流中读取一个字符。
+（2）int getchar(void) ：从标准输入读取一个字符。
+（3）char *fgets(char *str, int n, FILE *stream)：从流中读取一行到字符串。
+（4）void remove_newline(char *str) {
+    // 查找字符串中的换行符
+    char *newline = strchr(str, '\n');
+    // 如果找到了换行符，将其替换为字符串结束符
+    if (newline) {
+        *newline = '\0';
+    }
+}
+（5）char *gets(char *str)：从标准输入读取一行到字符串（不推荐使用，因为它不检查缓冲区溢出）。
+
+2 输出函数（除了puts都不追加换行符）
+（1）int putc(int char, FILE *stream) == int fputc(int char, FILE *stream)：向流中写入一个字符。
+（2）int putchar(int char)：向标准输出写入一个字符。
+（3）int fputs(const char *str, FILE *stream)：向流中写入一个字符串。
+（4）int puts(const char *str)：向标准输出写入一个字符串，并追加换行符。
+
+3 字符回推函数
+int ungetc(int char, FILE *stream)：将一个字符推回流中，以便它成为下一个被读取的字符。

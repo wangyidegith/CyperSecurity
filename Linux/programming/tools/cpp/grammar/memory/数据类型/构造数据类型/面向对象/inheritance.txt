@@ -1,0 +1,149 @@
+零 概念
+1 定义：一个类（派生类或子类）可以继承自某个类（基类或父类）。
+
+2 语法：
+`
+class Base {
+public:
+    void baseFunc() {}
+};
+class Derived : public Base {
+public:
+    void derivedFunc() {}
+};
+`
+
+
+
+
+
+
+
+一 规则
+（一）派生类对基类的访问权限（能从基类继承来什么）
+1 private继承
+private -> 不继承（没法访问让怎么继承）
+protected -> private
+public -> private
+
+2 protected继承
+private -> 不继承
+protected -> protected
+public -> protected
+
+3 public继承
+private -> 不继承
+protected -> protected
+public -> public
+
+
+
+（二）派生类可以做什么？
+1 添加新的成员但不能和继承来的同名。
+
+2 重写虚函数。
+（1）什么是虚函数？virtual。
+（2）作用：
+a 简单看，它允许在派生类中重新定义基类中定义的函数。
+b 这种重写配合cpp的继承，可以实现动态绑定（cpp 运行时多态的一种方法）。
+`
+#include <iostream>
+class Base {
+public:
+    virtual void show() {
+        std::cout << "Base class show function called." << std::endl;
+    }
+};
+class Derived : public Base {
+public:
+    void show() override {
+        std::cout << "Derived class show function called." << std::endl;
+    }
+};
+int main() {
+    Base *bptr;
+    Derived d;
+    bptr = &d;
+    bptr->show();  // 动态绑定发生在这里，像回调函数一杠提供一样统一接口
+    return 0;
+}
+`
+
+
+（三）构造函数和析构函数
+0 构造函数和析构函数不会被继承。
+
+1 构造函数：不能写成虚函数。
+语法：
+`
+class Base {
+public:
+    Base(int x) : baseMember(x) {}  // 基类的构造函数
+    // ...
+private:
+    int baseMember;
+};
+
+class Derived : public Base {
+public:
+    // 派生类构造函数的写法
+    Derived(int x, int y)
+        : Base(x), derivedMember(y)  // 初始化基类成员和派生类新增成员
+    {
+        // 可以在这里添加额外的初始化代码
+    }
+    // ...
+private:
+    int derivedMember;
+};
+
+`
+
+2 析构函数：建议写成虚函数。
+
+
+
+（四）多重继承
+0 从常理来看，一个父亲可以生n（n>=1）个孩子，孩子也可以继续生孩子，但是一个孩子只能由一个父亲，但是多重继承让一个孩子有多个父亲，这种有违常理的规则已经被多种高级编程语言废弃。
+
+1 菱形继承问题（二义性）：A派生B和C，D继承B和C，那么，现在问题来了：B和C都继承了A的某个成员，那么D将继承两个同名的成员，这是编程语言不允许的，因为这会产生二义性，那么如何解决、
+
+2 解决菱形继承问题：虚基类（注意构造函数，D还得写上A的构造函数）
+`
+#include <iostream>
+// 定义虚基类A
+class A {
+public:
+    A(int value) : a(value) {
+        std::cout << "A's constructor called with value " << a << std::endl;
+    }
+    int a;
+};
+// 定义类B，虚继承自A
+class B : virtual public A {
+public:
+    B(int value) : A(value) {
+        std::cout << "B's constructor called" << std::endl;
+    }
+};
+// 定义类C，虚继承自A
+class C : virtual public A {
+public:
+    C(int value) : A(value) {
+        std::cout << "C's constructor called" << std::endl;
+    }
+};
+// 定义类D，继承自B和C
+class D : public B, public C {
+public:
+    // 在这里必须调用虚基类A的构造函数
+    D(int value) : A(value), B(value), C(value) {
+        std::cout << "D's constructor called" << std::endl;
+    }
+};
+int main() {
+    D d(10);
+    std::cout << "D.a = " << d.a << std::endl; // 直接访问a，没有二义性问题
+    return 0;
+}
+`

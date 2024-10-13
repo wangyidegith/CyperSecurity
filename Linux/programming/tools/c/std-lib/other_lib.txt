@@ -1,0 +1,41 @@
+一 <assert.h>
+assert(expression);   // 无返回，参数expression可以是任何值为bool的表达式，expression为真继续执行，expression为假abort。
+
+
+
+
+
+
+
+二 <sys/syscall.h>
+long syscall(long number, ...);   // 这个函数非常牛逼，可以到用底层的系统调用。
+
+
+
+
+
+
+
+三 <stdarg.h>
+`
+#include <stdio.h>
+#include <stdarg.h>
+// 一个简单的函数，它接受一个固定参数和任意数量的其他参数
+double average(int num, ...) {
+    va_list args;
+    double sum = 0.0;
+    // 初始化 args 指向 num 之后的位置
+    va_start(args, num);
+    // 计算所有参数的总和
+    for (int i = 0; i < num; i++) {
+        sum += va_arg(args, int);   // C语言的可变长参数表的关键就是类型丢失了，你必须在在这个函数里说明该参数的类型。
+    }
+    // 清理 args
+    va_end(args);
+    // 返回平均值
+    return sum / num;
+}
+int main() {
+    printf("Average of 2, 3, 4, 5 is %f\n", average(4, 2, 3, 4, 5));
+    return 0;
+}

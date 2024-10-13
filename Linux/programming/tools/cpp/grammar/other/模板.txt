@@ -1,0 +1,93 @@
+零 概念
+1 定义：模板是泛型编程的基础，数据类型泛化。
+
+2 分类：
+（1）函数模板
+（2）类模板
+
+3 函数模板和模板函数的关系：声明和定义的关系。
+
+
+
+
+
+
+
+一 函数模板
+（一）单个
+`
+template <typename T>   // template、typename是关键字，T不是关键字而是业界的习惯用法
+T max(T a, T b) {
+    return (a > b) ? a : b;
+}
+`
+
+
+
+（二）多个
+`
+template <typename T1, typename T2>   // 意为不同类型，兹要类型不同就行
+T1 add(T1 a, T2 b) {
+    return a + static_cast<T1>(b);
+}
+`
+
+
+
+
+
+
+
+二 类模板
+（一）单个
+`
+template <typename T>
+class Box {
+private:
+    T value;
+public:
+    Box(T val) : value(val) {}
+    T getValue() const {
+        return value;
+    }
+    void setValue(T val) {
+        value = val;
+    }
+};
+`
+
+
+
+（二）多个
+`
+#include <iostream>
+#include <string>
+template <typename T1, typename T2>
+class Pair {
+private:
+    T1 first;
+    T2 second;
+public:
+    Pair(T1 f, T2 s) : first(f), second(s) {}
+    T1 getFirst() const {
+        return first;
+    }
+    T2 getSecond() const {
+        return second;
+    }
+    void setFirst(T1 f) {
+        first = f;
+    }
+    void setSecond(T2 s) {
+        second = s;
+    }
+};
+int main() {
+    Pair<int, std::string> pair1(10, "Hello");
+    std::cout << "First: " << pair1.getFirst() << ", Second: " << pair1.getSecond() << std::endl;
+    pair1.setFirst(20);
+    pair1.setSecond("World");
+    std::cout << "First: " << pair1.getFirst() << ", Second: " << pair1.getSecond() << std::endl;
+    return 0;
+}
+`

@@ -1,0 +1,36 @@
+零 概念：编程语言的任何名称在一定范围内都不能重名，那么，比如string库里定义了一个函数strlen，然后你又写了一个函数strlen，这肯定不行啊，但是用上命名空间就可以了。
+
+
+
+
+
+
+
+一 语法
+（一）基本语法
+namespace namespace_name {
+   // 代码声明，extern也起作用
+}
+
+
+
+（二）可嵌套。
+`
+namespace namespace_name1 {
+   // 代码声明
+   namespace namespace_name2 {
+      // 代码声明
+   }
+}
+// 访问 namespace_name2 中的成员
+using namespace namespace_name1::namespace_name2;
+// 访问 namespace_name1 中的成员
+using namespace namespace_name1;
+`
+
+
+
+（三）如何使用？
+1 <namespace_name>::<name>
+
+2 <using namespace> <namespace_name>;   // 该语句之后所有代码都用该命名空间
