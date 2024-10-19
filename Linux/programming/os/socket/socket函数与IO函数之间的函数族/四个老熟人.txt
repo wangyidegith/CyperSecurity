@@ -1,0 +1,105 @@
+零 概览
+0 四个老熟人：bind（绑定本地地址）   listen（监听本地TCP地址）   accept（接收远端TCP地址）   connect（绑定远端地址）
+
+1 listen和accept是三次握手函数，只能用于TCP网络编程；
+
+2 connect可作为三次握手函数可以发起第一次TCP握手，也可connect和bind对应，bind可以用来为某个套接口绑定【本地地址】，而connect可以为某个套接口绑定【远端地址】。
+
+
+
+
+
+
+
+一 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);   
+（一）功能：该函数的功能在于将创建好的套接口与一个【本地地址】绑定。
+1 这个套接口可以是任何套接口，不是非得是TCP套接口；
+
+2 一旦绑定成功，该套接口只能收到来自于该本地地址的数据，也只能从该本地地址发送数据；
+
+3 原始套接口没有必要使用这个函数，而标准套接口在开发服务器程序时必须使用这个函数。	
+
+
+
+（二 ）返回值：成0败-1
+
+
+
+（三）参数：
+1 sockfd：要绑定的套接口描述符
+
+2 addr（传入参数）：本地地址结构，不能是远端地址
+
+3 addrlen（传入参数）：传入的地址结构的长度
+
+
+
+
+
+
+
+二 int listen(int sockfd, int backlog);
+（一）功能：通知内核该套接口为一个被动套接口，只能接收连接，而不能主动发起连接或者其他IO，内核会为其准备一个监听队列，用来存放第一次握手。
+
+
+
+（二）返回值：成0败-1
+
+
+
+（三）参数：
+1 sockfd：要监听的套接口描述符
+
+2 backlog：监听队列的大小
+
+
+
+
+
+
+
+三 int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+（一）功能：处理三次握手。
+
+
+
+（二）返回值：成0败-1
+
+
+
+（三）参数：
+1 sockfd：TCP监听套接口
+
+2 addr（传出参数）：对端地址
+
+3 addrlen（传出参数）：对端地址长度
+
+
+
+
+
+
+四 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+（一）功能：
+1 当sockfd是一个TCP套接口时（面向连接）：
+（1）connect发起连接请求（第一次握手），等待接收连接响应，并发送确认包，这里存在一个connect何时返回的问题，目前还不解；
+（2）connect将一个（本地IP地址+本地端口号+远端IP地址+远端端口号）四元组与sockfd绑定；
+（3）使用connect(3， &addr， len);建立连接后，如果再connect(3， &addr_another， len);，那么connect会返回-1，并指错误号为EISCONN，想要再次调用connect将3与另一个四元组绑定，需要先断开连接。
+
+2  当sockfd是一个非TCP套接口时（无连接）：
+（1）connect并不发送任何东西给远端地址；
+（2）当sockfd是一个UDP套接口时，connect将一个（远端IP地址+远端端口号）二元组与sockfd绑定；当sockfd是一个原始套接口时，connect将一个（远端IP地址）与sockfd绑定；
+（3）使用connect(3， &addr， len);建立连接后，如果再connect(3， &addr_another， len);，那么connect不会发生错误，而是解绑了原来的远端地址，为3重新绑定了远端地址。
+
+
+
+（二）返回值：成0败-1
+
+
+
+（三）参数：
+1 sockfd：要绑定的套接口描述
+
+2 addr（传入参数）：远端地址结构
+
+3 addrlen（传入参数）：传入的地址结构的长度

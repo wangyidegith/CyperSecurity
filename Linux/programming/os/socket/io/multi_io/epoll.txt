@@ -1,0 +1,106 @@
+一 epoll机制（对照select机制的三点缺陷，正好对应epoll的三个函数）
+（一）可监听的描述符无限制。
+0 函数原型：int epoll_create1(int flags);   // int epoll_create(size);   // 该函数已被废弃，size是可监听的最大描述符，但这是一个建议值
+
+1 返回值：成功返回epoll句柄，失败返回-1。
+
+2 参数：
+（1）0：不设置EPOLL_CLOEXEC
+（2）EPOLL_CLOEXEC：表示epoll句柄不被exec的新进程继承。
+
+
+
+（二）epoll提供了一个全部客户端数据结构（一颗红黑树）并提供了增删改功能
+0 函数原型：int epoll_ctl(int epfd, int op, int fd, struct epoll_event* event);
+
+1 返回值：成0败-1。
+
+2 参数：
+（1）epfd：epoll句柄，通过epoll_create1函数拿到。
+（2）op：
+EPOLL_CTL_ADD：建立连接的时用
+EPOLL_CTL_MOD：修改event时用
+EPOLL_CTL_DEL：连接断开的时候用
+（3）fd：socket描述符。
+（4）客户端数据结构。
+struct epoll_event {
+    __uint32_t events;   // epoll的事件类型，这是使用epoll的关键，下面会详细讲解
+    epoll_data_t data;   // User data variable，像select那样完全不提供客户端数据结构不好，像poll把用户数据结构限制死也不好，epoll既提供了一个客户端数据结构，又允许用户可以自定义客户端数据结构
+};
+typedef union epoll_data {
+    void* ptr;   // 这就是上面说的“epoll允许用户可以自定义客户端数据结构”
+    int fd;
+    __uint32_t u32;
+    __uint64_t u64;
+} epoll_data_t;
+
+
+
+
+（三）epoll完全实现了监听集和事件集的分离：监听集就是红黑树也就是全部客户端数据结构，事件集是epoll_wait的传出数组
+0 函数原型：int epoll_wait(int epfd, struct epoll_event* events, int maxevents, int timeout);
+
+1 返回值（== timeout参数解析）：
+（1）阻塞（timeout == 0）：
+a 有事件则返回有事件的fd数量；
+b 没有事件就一直阻塞；
+c 出错返回-1。
+（2）非阻塞（timeout == >0）：
+a 有事件则返回有事件的fd数量；
+b 没有事件一到时间返回0；
+c 出错返回-1。
+
+2 参数：
+（1）epfd：epoll句柄。
+（2）events：是一个传出数组，里面存放了所有有事件的节点。
+（3）maxevents：可以返回的最大事件数，也就是events数组的长度。
+（4）timeout：详见返回值。
+
+
+
+
+
+
+
+二 epoll的事件类型
+（一）类别：
+1 
+EPOLLIN
+EPOLLOUT
+EPOLLERR
+
+2 
+EPOLLPRI
+EPOLLRDHUP
+EPOLLHUP
+
+3 
+EPOLLET
+EPOLLONESHOT
+注意：没有EPOLLLT，LT是默认的！
+
+
+
+（二）水平触发、边沿触发、一次触发
+0 概念终极解析：
+（1）事件：有数据可读这叫读事件，有空间可写这叫写事件，等等。
+（2）触发：某个fd有数据可读，这叫该fd触发了读事件。
+
+1 水平触发：只要读缓冲区中有数据就触发，不要管这个数据的情况是什么乱七八糟的情况，epoll都会认为当前的情况是一次新事件。
+
+2 边沿触发：
+某套接口收到了10B数据，这是新事件，触发，用户读走了10B，然后该套接口又收到了10B数据，新到的10B数据自然会被epoll认为是一次新事件，继而触发，这种情况看不出水平触发和边沿触发的区别；
+某套接口收到了10B数据，这是新事件，触发，但是用户只读走了2B，那么对于剩下的8B数据，当epoll再一次监听时会认为这8B数据是新事件还是旧事件，我们在水平触发里面已经说过了，不管什么情况，对于水平触发而言都是新事件，可对于边沿触发而言，这8B数据是旧事件而非新事件，因而这8B数据并不会触发；
+在上面的基础上，如果又来了10B数据呢？那么加上之前的8B数据，18B的数据会被epoll认为成一个新事件继而触发。
+
+3 一次触发：当一个套接口以EPOLLONESHOT作为事件类型ADD上红黑树时，epoll只监听它一次，此时你就算也位或上了ET或者LT，它们也不起作用了。
+
+
+
+
+
+
+
+三 epoll机制存在几个难以理解的问题
+1 可读和要读是一个概念，但是可写和要写并不是一个事，当epoll监听到某个套接字的发送缓冲区有空闲时，此时程序并不一定要写啊，二者如何协调是一个问题。
+

@@ -1,0 +1,35 @@
+一 概述（5对io函数）
+除了我们非常熟悉的Linux标准IO函数read/write以外，还有一种专门用于套接口的IO函数：recv和send，这一对函数还可以指定flag；
+readv/writev是read/write的多缓冲区升级版，recvmsg/sendmsg是recv/send的多缓冲区升级版，另外recvmsg/sendmsg封装了iovec，增加了一些其他信息比如远端地址；
+除了上面四对函数以外，还剩下：recvfrom/sendto，这两个函数相比recv/send，主要的升级是可以指定远端地址，另外recvmsg/sendmsg也是可以指定远端地址的。
+
+
+
+
+
+
+
+二 通用性针对性、单多缓冲区、flags这些都不是什么重要的区别，但是是否可以指定远端地址在实际编程中却很值得关注：
+（一）ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen);
+1 返回值：和read一样，所有的IO函数的返回值都是一致的。
+
+2 参数：
+	sockfd：从sockfd的接收缓冲区接收数据包
+	buf：将接收到的数据包放入buf
+	len：buf的长度
+	flags：标志位，用于该次读的属性控制
+	src_addr（传出参数，可以为NULL意即不关心该参数）：数据包是从哪个地址过来的
+	addrlen（传出参数，可以为NULL意即不关心该参数）：传出src_addr的大小
+
+
+
+（二）ssize_t sendto(int sockfd, void *buf, size_t len, int flags, struct sockaddr *dst_addr, socklen_t *addrlen);
+1 返回值：和write一样，所有的IO函数的返回值都是一致的。
+
+2 参数：
+	sockfd：向sockfd的发送缓冲区发送数据包
+	buf：将buf作为数据包发往套接口
+	len：buf的长度
+	flags：标志位，用于该次写的属性控制
+	dst_addr（传入参数，不能为NULL）：数据包发往哪个地址
+	addrlen（传入参数，不能为NULL）：dst_addr的大小

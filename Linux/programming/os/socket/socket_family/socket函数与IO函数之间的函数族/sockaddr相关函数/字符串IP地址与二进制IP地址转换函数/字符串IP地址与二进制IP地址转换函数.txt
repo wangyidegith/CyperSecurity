@@ -1,6 +1,0 @@
-详见《Linux网络编程》216页和218页，其中：
-	字符串转二进制：
-		inet_aton       inet_addr       inet_pton（inet_aton的升级版本，可重入且协议无关）       inet_network（只转网络号）
-	二进制转字符串：
-		inet_ntoa       inet_ntop（inet_ntoa的升级版本，可重入且协议无关）
-		
