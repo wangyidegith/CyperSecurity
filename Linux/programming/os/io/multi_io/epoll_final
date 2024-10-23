@@ -1,4 +1,0 @@
-epoll function -> epoll 3 interface 1 struct(a ptr is user data b events) 1 union-> epoll architecture
-
-events :
-	lt and et : what -> related with "read out only one time" -> how to think

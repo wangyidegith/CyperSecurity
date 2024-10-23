@@ -1,0 +1,85 @@
+零 锁是最基本的同步机制，其工作原理是让各个线程争用一把锁，谁拿到锁谁就执行被锁住的代码，拿不到就等别人释放，别人一释放就去抢。
+通过锁的工作机制，我们可以看出几个有趣的点：
+1 锁是要锁什么？锁代码段而非数据。
+（1）这是和atomic不同的地方，atomic是针对数据的，而锁无关数据。
+（2）因而锁并不是强制的，也就是说锁的代码段里有个数据，其他线程一样可以对该数据进行任何操作。
+
+2 锁的意义在于多线程争用共享资源，所以别闲的没事做用锁，那是白白浪费资源。
+
+
+
+
+
+
+
+一 互斥锁
+（一）互斥锁的初始化和销毁
+1 初始化
+（1）静态初始化：pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+（2）动态初始化：
+pthread_mutex_t mutex;
+pthread_mutex_init(&mutex, NULL);
+
+2 销毁
+pthread_mutex_destroy(&mutex);
+
+
+
+（二）互斥锁操作
+1 抢锁：pthread_mutex_lock(&mutex);
+这个函数会去抢锁，如果抢到了那么就执行后面，如果抢不到就阻塞。
+
+2 解锁：pthread_mutex_unlock(&mutex);
+
+
+
+
+
+
+
+二 自旋锁（自旋的互斥锁）
+（一）自选锁的初始化和销毁
+1 初始化
+pthread_mutex_t mutex;
+pthread_spin_init(&spin, PTHREAD_PROCESS_PRIVATE)
+第二个参数：
+PTHREAD_PROCESS_PRIVATE：表示自旋锁只用于当前进程。
+PTHREAD_PROCESS_SHARED：表示自旋锁可以在多个进程之间共享（需要在共享内存中使用）。
+
+2 销毁
+pthread_spin_destroy(&spin);
+
+
+
+（二）自旋锁操作
+1 抢锁：pthread_spin_lock(&mutex);
+这个函数会去抢锁，如果抢到了那么就执行后面，如果抢不到（注意和互斥锁的区别来了）就轮询而非阻塞（因而自旋锁适用于占用锁时间很短的情况）。
+
+2 解锁：pthread_spin_unlock(&mutex);
+
+
+
+
+
+
+
+三 读写锁（兹要说起读写锁，像三件事就行，一个圆、十一字真言、一把锁）
+（一）读写锁的初始化和销毁
+1 初始化
+（1）静态初始化：pthread_rwlock_t rwlock = PTHREAD_RWLOCK_INITIALIZER;
+（2）动态初始化：
+pthread_rwlock_t rwlock;
+pthread_rwlock_init(&rwlock, NULL);
+
+2 销毁
+pthread_rwlock_destroy(&rwlock);
+
+
+
+（二）读写锁操作
+1 抢锁（理解读写锁的关键）：读写锁就是一句话：写独占读共享写优先级高，这里要说明是十一个字而非十二个字，有的教程会说是“写独占读共享写锁优先级高”，说实话我很不喜欢这个“写锁”“读锁”这种说法，因为锁就是读写锁，就只有一把锁，这种说法说的好像有两把锁一样，这里涉及理解读写锁的关键了，只有一把锁，读写代表了对该锁的操作，当wrlock拿到锁后，其他不管读写都拿不到锁，这就是写独占，当rdlock拿到锁后，其他rdlock能拿到锁，这就是读共享，那么，当rdlock拿到锁后，wrlock能拿到吗？注意：不能！wrlock要是能拿到，还要rdlock干什么？因而此时wrlock要想拿到锁必须等所有的rdlock释放掉锁以后才能去抢，当wrlock和rdlock去抢锁时，wrlock更容易抢到锁，这就是写优先级高，因而我们能看出来，读写锁更适用于读多写少的情况。
+pthread_rwlock_rdlock(&rwlock);
+pthread_rwlock_wrlock(&rwlock);
+这个函数会去抢锁，如果抢到了那么就执行后面，如果抢不到就阻塞。
+
+2 解锁：pthread_rwlock_unlock(&mutex);

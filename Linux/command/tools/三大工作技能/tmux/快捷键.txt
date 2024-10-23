@@ -1,0 +1,36 @@
+注：先同时按Ctrl + b，再松开，再按键。
+
+会话管理
+新建会话: tmux
+分离会话: Ctrl + b 然后按 d
+重新连接会话: tmux attach-session -t <session-name>
+列出会话: tmux ls
+
+窗口管理
+新建窗口: Ctrl + b 然后按 c
+切换到下一个窗口: Ctrl + b 然后按 n
+切换到上一个窗口: Ctrl + b 然后按 p
+切换到指定窗口: Ctrl + b 然后按窗口编号（例如 0, 1, 2 等）
+关闭窗口: exit 或 Ctrl + b 然后按 &
+
+面板管理
+水平分割面板: Ctrl + b 然后按 %
+垂直分割面板: Ctrl + b 然后按 "
+切换面板: Ctrl + b 然后按箭头键（↑↓←→）
+关闭面板: Ctrl + b 然后按 x，确认关闭
+
+窗口和面板的其他操作
+重命名窗口: Ctrl + b 然后按 ,
+查看帮助: Ctrl + b 然后按 ?
+刷新面板: Ctrl + b 然后按 r
+锁定会话: Ctrl + b 然后按 l
+
+窗口和面板的布局
+平铺（布局）: Ctrl + b 然后按 Space
+选择布局: Ctrl + b 然后按 Alt + 1 或 Alt + 2 等
+
+拷贝模式
+进入拷贝模式: Ctrl + b 然后按 [
+退出拷贝模式: q 或 Esc
+拷贝文本: 在拷贝模式中，使用方向键选择文本，然后按 Enter 进行拷贝
+粘贴文本: Ctrl + b 然后按 ]

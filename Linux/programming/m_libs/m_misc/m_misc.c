@@ -47,10 +47,3 @@ void generateHashOfSha256(const char* input, unsigned char* output) {
 	output[2 * SHA256_DIGEST_LENGTH] = '\0';
 }
 
-void intToStr(char* str, int i) {
-	snprintf(str, 11, "%d", i);
-}
-
-void ushortToStr(char* str, unsigned short us) {
-	snprintf(str, 6, "%hu", us);
-}
