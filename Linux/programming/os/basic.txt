@@ -1,0 +1,30 @@
+零 os分类
+（零）UNIX：1969年贝尔实验室开发的os，是UNIX-like的零点。
+
+
+
+（一）UNIX-like（他们同一使用POSIX标准）：
+1 开源的：
+（1）Linux：
+a Debian：比如Ubuntu、Kali。
+b Redhat：比如centos。
+（2）BSD。
+
+2 不开源的（不开源的就可以称之为UNIX系统）：
+（1）sun的Solaris
+（2）IBM的AIX
+（3）hp的HP_UX
+（4）apple的MACos
+
+
+
+（二）Windows
+
+
+
+（三）嵌入式（都是开源的，市面上也有不开源的但是以开源为主）
+1 Linux：Linux也经常被用于嵌入式os，但是需要裁剪。
+
+2 freeRTOS（不完全遵从POSIX）：task就相当于pthread，没有进程。
+
+3 opnewrt（大体遵从POSIX）：常用于网络设备。

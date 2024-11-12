@@ -32,7 +32,7 @@ protected -> protected
 public -> protected
 
 3 public继承
-private -> 不继承
+private -> 不继承：这里很玄妙，说的是不继承但是是说你不能直接访问而不是说子类中没有这个父类的私有数据，对，是有的，你也许会继承某个父类私有变量的get、set函数，你可以通过get、set访问。
 protected -> protected
 public -> public
 
@@ -99,7 +99,44 @@ private:
 
 `
 
-2 析构函数：建议写成虚函数。
+2 析构函数：建议写成虚函数，原因请看下面。
+
+3 构造函数和析构函数的调用顺序问题（这块内容是相当核心的一块内容）：
+（0）先回忆一下上面：子类构造函数也得实现父类的构造函数。
+（1）创建子类对象时，构造函数的调用顺序：先调用基类，再调用子类。
+注意：不管子类对象由基类指针还是子类指针指向都是这个顺序。
+（2）销毁子类对象时，析构函数的调用顺序：
+如果子类对象由基类指针指向：调用基类析构函数而不调用子类析构函数。
+如果子类对象由子类指针指向：先调用子类，再调用基类。
+（3）如果基类虚构函数是虚函数呢？销毁子类对象时，析构函数的调用顺序是：先调用子类，再调用基类。
+`
+#include <iostream>
+class Base {
+public:
+    Base() {
+        std::cout << "Base constructor called" << std::endl;
+    }
+    ~Base() { // 虚析构函数
+        std::cout << "Base destructor called" << std::endl;
+    }
+};
+class Derived : public Base {
+public:
+    Derived() {
+        std::cout << "Derived constructor called" << std::endl;
+    }
+    ~Derived() {
+        std::cout << "Derived destructor called" << std::endl;
+    }
+};
+int main() {
+    Base* b = new Derived(); // 使用基类指针指向派生类对象
+    delete b; // 正确调用派生类和基类的析构函数
+    Derived* d = new Derived(); // 使用派生类指针
+    delete d; // 只会调用派生类的析构函数
+    return 0;
+}
+`
 
 
 

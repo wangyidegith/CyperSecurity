@@ -113,7 +113,7 @@ AF_PACKET有一种协议类型：SOCK_PACKET。
 3 第三个参数protocol：
 （0）注意：该值是粘合剂，会和收发的数据包中的协议号（详见IP包格式）做比对，须是同一协议号才能收发成功，作为在网络上传输的数据包，其协议号字段必是网络字节序。
 （1）协议列表
-TCP/IP协议栈：
+a TCP/IP协议栈：
 SOCK_STREAM类型：
     IPPROTO_TCP（填0即默认为6）：6
 SOCK_DGRAM：
@@ -130,7 +130,8 @@ SOCK_RAW：（协议号的取值范围是0~255，因而不需要进行字节序�
     IPPROTO_UDP：17
     IPPROTO_ICMP：1
     IPPROTO_IGMP ：2   // 用于发送和接收IGMP协议的数据包，用于组播。
-AF_PACKET：
+SOCK_PACKET（被AF_PACKET代替）：直接从网卡驱动收发包。
+b AF_PACKET：
 SOCK_PACKET类型：
     ETH_P_ALL - 接收或发送所有协议类型的数据包。
     ETH_P_IP - 接收或发送IPv4数据包。
@@ -293,4 +294,3 @@ ETH_P_8021Q：0X8100
 #define   ETH_HLEN   14	// 以太帧的头部长度
 #define   ETH_ZLEN   60	// 不含CRC的以太帧最小长度							
 #define   ETH_FRAME_LEN   1514	// 不含CRC的以太帧最大长度
-		

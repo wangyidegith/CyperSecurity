@@ -1,0 +1,123 @@
+零 内核编程
+（零）内核编程的概念
+0 netfilter涉及到的是内核网络编程，因而首先要研究内核编程。
+
+1 什么是内核编程？就是LKM，即Linux内核模块。
+
+2 Linux内核代码在哪？你得去下载，下载后在/usr/src里查看，其中net是协议栈源码。
+
+
+
+（一）内核编程的步骤
+1 编写内核模块：
+`
+#include <linux/module.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/skbuff.h>
+#include <linux/netdevice.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Your Name");
+MODULE_DESCRIPTION("A simple Netfilter module");
+// Hook function definition
+static unsigned int my_hook_func(void *priv,
+                                  struct sk_buff *skb,
+                                  const struct nf_hook_state *state) {
+    printk(KERN_INFO "Packet intercepted!\n"); // Log message
+    return NF_ACCEPT; // Allow the packet to pass
+}
+// Hook operations struct
+static struct nf_hook_ops my_hook_ops = {
+    .hook = my_hook_func,
+    .pf = PF_INET,
+    .hooknum = NF_INET_PRE_ROUTING,
+    .priority = NF_IP6_PRI_FIRST,
+};
+// Module initialization function
+static int __init my_module_init(void) {
+    nf_register_net_hook(&init_net, &my_hook_ops);
+    printk(KERN_INFO "Netfilter module loaded.\n");
+    return 0;
+}
+// Module exit function
+static void __exit my_module_exit(void) {
+    nf_unregister_net_hook(&init_net, &my_hook_ops);
+    printk(KERN_INFO "Netfilter module unloaded.\n");
+}
+module_init(my_module_init);
+module_exit(my_module_exit);
+`
+
+2 编写makefile并编译
+`
+obj-m += my_netfilter_module.o
+all:
+    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+clean:
+    make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+`
+
+3 加载卸载模块
+insmod <module_name>.ko   // 不处理依赖关系
+rmmod <module_name>
+lsmod <module_name>
+modinfo <module_name>
+
+
+
+
+
+
+
+
+一 内核网络编程
+（一）内核协议栈结构
+1 内核协议栈结构：三级结构（整个os内核也是一个三级结构）
+
+2 sk_buff
+（1）双向循环链表
+（2）里头有一块是报文缓冲区，负责存储协议数据。
+
+3 inet_protosw：协议管理结构
+
+
+
+（二）软中断
+0 中断
+（0）中断的定义：
+首先，让我们回顾一下在os三大基础概念中有一个叫阻塞非阻塞的概念和进程状态转换图，中断的表现正是进程状态的转换。
+其次，中断其实就是一个正在执行当中的程序被暂停，进到就绪态活阻塞态，而原程序被暂停之后去谁被执行了呢？执行中断处理程序，等中断处理程序执行完了以后又回来执行原程序。
+（1）中断的处理过程：
+中断请求：设备向CPU发送中断信号。
+保存上下文：CPU保存当前程序的状态（寄存器、程序计数器等）。
+识别中断：CPU识别中断源并确定要执行的中断处理程序。
+执行中断处理程序：CPU转移到中断处理程序，执行必要的操作。
+恢复上下文：完成处理后，恢复之前的程序状态。
+继续执行：CPU继续执行被中断的程序。
+（2）中断的类型：
+a 硬中断：外设事件；
+b 软中断：软件事件或异常。
+（3）中断请求（或者说中断信号）是有优先级的，优先级高的先被处理。
+（4）三大组件（中断的原理，软中断部分会细讲）：中断状态、中断控制器或程序、中断向量表。
+（5）软硬中断类型的区别：原理一致，但硬中断是通过硬件完成的，这个硬件一般较中断控制器。
+
+1 软中断
+（0）三大组件：软中断状态、软中断守护线程、软中断向量表。
+a 软中断状态
+b 负责接收中断信号，检查和从中断状态队列拿任务，映射中断向量和中断处理程序。
+c 所谓中断向量就是中断处理程序的key。中断向量是一个结构：
+struct softirq_action {
+    void (*action)(struct softirq_action *); // 软中断处理函数的指针，就是中断处理程序了
+    void* data; // action参数
+};
+
+
+
+
+
+
+
+二 netfilter（内核网络编程的具体应用）
+（零）是什么？hook == 拦截，比如回调函数（最典型的就是界面编程，各种回调函数），比如动态库注入。
