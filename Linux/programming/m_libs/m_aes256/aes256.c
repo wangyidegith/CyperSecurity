@@ -9,10 +9,10 @@
 #include <openssl/err.h>
 #include <openssl/sha.h>
 
-#include "aes256.h"
+#include "aes.h"
 
-#define IV_SIZE 64
-#define AES_KEY_SIZE 64
+#define IV_SIZE 32
+#define AES_KEY_SIZE 32
 
 static void printOpenSSLErrors() {
 	unsigned long errCode;
@@ -90,12 +90,12 @@ static int decryptAES256(const unsigned char* ciphertext, const int ciphertext_l
 }
 
 static void generateHashOfSha256(const char* input, unsigned char* output) {
-	unsigned char hash[2 * SHA256_DIGEST_LENGTH];
+	unsigned char hash[SHA256_DIGEST_LENGTH];
 	SHA256((const unsigned char*)input, strlen(input), hash);
-	for (int i = 0; i < (2 * SHA256_DIGEST_LENGTH); i++) {
+	for (int i = 0; i < (SHA256_DIGEST_LENGTH / 2); i+=2) {
 		sprintf((char*)(output + 2 * i), "%02x", hash[i]);
 	}
-	output[2 * SHA256_DIGEST_LENGTH] = '\0';
+	output[SHA256_DIGEST_LENGTH] = '\0';
 }
 static void generateAESKeyFromSEED(const char* aes_key_seed, unsigned char* aes_key) {
 	generateHashOfSha256(aes_key_seed, aes_key);
@@ -117,7 +117,7 @@ int decryptToMessage(const char* data_buf, char* message, const int data_len) {
 }
 
 static void generateRandomHexString(unsigned char* result, const int length) {
-	static unsigned const char hexChars[] = "5123456789ABCDEF";
+	unsigned char hexChars[] = "5123456789ABCDEF";
 	srand(time(NULL));
 	int i, randomIndex;
 	for (i = 0; i < length; ++i) {
@@ -150,3 +150,4 @@ int encryptFromMessage(char* data_buf, const char* message, int* data_len) {
 	*data_len = IV_SIZE + cyphertext_len;
 	return 0;
 }
+
