@@ -1,0 +1,144 @@
+零 概念
+0 什么是stl？stl（标准模板库）是一组提供了常见数据结构和算法的模板类和模板函数。
+
+1 stl的组成要素：容器即数据结构 + 算法 + 迭代器
+
+
+
+
+
+
+
+一 容器
+0. 概述
+（0）15种容器，官方分类为四类：
+a 序列化容器：vector、deque、list，官方并没有把string作为容器。
+b 关联容器：set、map、multiset、multimap
+c 无序关联容器：unordered_set、unordered_map、unordered_multiset、unordered_multimap
+d 容器适配器：stack、queue、priority_queue。
+（1）支持随机访问（又叫直接访问，或者下标访问，注意set、map这些关联数组都提供operator[]，但注意这本质上不是下标访问这叫键访问）的就是：string、vector、deque。
+（2）set、map这种关联数据结构，就是四类：原生的（有序、唯一）、multi（有序、可重复）、unordered（无序、唯一）、unordered+multi（无序、可重复）。
+（3）名字里带队列的有三种：queue（标准的先进先出队列）、priority_queue（最大堆，按优先级）、deque（就不是queue）。
+
+1 序列化容器
+std::string
+应用场景：用于处理和存储文本数据，适合字符串操作，如拼接、查找和替换等。
+std::vector
+应用场景：适合需要动态数组的场景，支持快速随机访问和高效的增删操作，常用于存储元素的序列。
+std::deque
+应用场景：适合需要在两端进行快速插入和删除的场景，如双端队列，支持随机访问。
+std::list
+应用场景：适合频繁插入和删除的场景，尤其在中间位置插入时，常用于实现链表结构。
+
+2 容器适配器
+std::stack
+应用场景：实现后进先出 (LIFO) 数据结构，常用于函数调用管理、回溯算法和表达式求值。
+std::queue
+应用场景：实现先进先出 (FIFO) 数据结构，常用于任务调度、事件处理和打印任务管理。
+std::priority_queue
+应用场景：用于管理优先级的数据，常用于任务调度、图算法（如 Dijkstra 算法）和 Huffman 编码。
+
+3 关联容器
+std::set
+应用场景：存储唯一元素，常用于去重、集合运算和有序数据存储。
+std::map
+应用场景：存储键值对，提供有序的键值访问，适合快速查找和有序遍历的场景，如配置管理。
+std::multiset
+应用场景：存储重复元素，适合需要频繁插入和查询的场景，如统计频率。
+std::multimap
+应用场景：存储重复键的键值对，适合需要快速查找和多值存储的场景，如数据库索引。
+
+4 无序关联容器
+std::unordered_set
+应用场景：存储唯一元素，但不保证顺序，提供快速查找，适合需要高效集合操作的场景。
+std::unordered_map
+应用场景：存储键值对，但不保证顺序，提供快速查找，适合需要高效键值操作的场景，如缓存实现。
+std::unordered_multiset
+应用场景：存储重复元素，适合需要快速查找和插入的场景，如词频统计。
+std::unordered_multimap
+应用场景：存储重复键的键值对，适合快速查找和多值存储的场景，如记录用户的多次登录信息。
+
+
+
+
+
+
+
+三 迭代器
+（零）概念：无需关注容器本身的遍历接口。
+
+
+
+（一）获取方式
+0 C++ 11之前
+std::vector<int>::iterator it = vec.begin();   // 指向第一个元素
+std::vector<int>::iterator end = vec.end();   // 指向最后一个元素后的位置
+
+1 C++ 11及以后
+auto it = vec.begin();
+auto end = vec.end();
+
+
+
+（二）使用方式
+0 解引用: 使用 * 操作符访问当前指向的元素。
+
+1 递增和递减: 使用 ++ 或 -- 移动到下一个或上一个元素。
+
+2 比较: 使用 == 和 != 比较两个迭代器。
+
+
+
+（三）本质：不是指针也不是引用而是一种数据结构，但是其行为表现确实和指针一样。
+
+
+
+
+
+
+
+三 算法
+（零）根本：访问
+0 迭代器访问法：任何容器都可以用。
+
+1 for-each
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::vector<int> vec = {1, 2, 3, 4, 5};
+
+    // 使用范围 for 循环访问元素
+    for (const auto& elem : vec) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+2 直接访问法（随机访问法、下标访问法）：就是我们熟悉的数组下标访问法，仅可用于三种：string、vector、deque。
+
+3 键访问法（针对关联数据结构的方法：operator[] 和 at()）
+int main() {
+    // 使用 std::map 演示 operator[] 和 at()
+    std::map<std::string, int> fruitMap;
+    
+    // 插入元素
+    fruitMap["apple"] = 1;
+    fruitMap["banana"] = 2;
+
+    // 使用 operator[] 访问元素
+    std::cout << "Using operator[]:" << std::endl;
+    std::cout << "apple: " << fruitMap["apple"] << std::endl;  // 输出: apple: 1
+    std::cout << "banana: " << fruitMap["banana"] << std::endl; // 输出: banana: 2
+
+    // 使用 at() 访问元素
+    std::cout << "\nUsing at():" << std::endl;
+    std::cout << "apple: " << fruitMap.at("apple") << std::endl;  // 输出: apple: 1
+    std::cout << "banana: " << fruitMap.at["banana"] << std::endl; // 输出: banana: 2
+}
+
+4 stack、queue这些特殊数据结构的访问方法
+（0）stack：top()、pop()
+（1）queue：front()、back()
