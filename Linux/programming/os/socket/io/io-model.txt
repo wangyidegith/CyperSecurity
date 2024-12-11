@@ -1,0 +1,121 @@
+零 BIO
+0 不能单线程，只能一个客户端一个进程或者线程，循环accept。
+问题：架构简单，但浪费资源、并发量高不了想高只能继续浪费资源、难以处理客户端突然宕机断网的情况。
+
+
+
+
+
+
+
+一 NBIO
+0 单线程轮询不用epoll（其实就是把epoll放到应用层）
+问题：架构简单，但数据量大不了。
+
+1 多线程是完全没必要的。
+
+
+
+
+
+
+
+二 multi io
+0 epoll监听主线程
+问题：架构简单，是我们最常用的IO模型，并发性能好，根据数据量大小选择epoll监听主线程作为单线程还是接处理线程 | 线程池。
+
+
+
+
+
+
+
+三 信号驱动IO（以下是一个基于信号驱动的TCP回显服务器）
+问题：什么都好，但是信号本身有问题即信号可能会丢失（？）、不易同步。
+`
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <arpa/inet.h>
+
+#define PORT 8080
+#define BUFFER_SIZE 1024
+
+int server_fd;  // 声明 server_fd 为全局变量
+
+void sigio_handler(int signo) {
+    int client_fd;
+    char buffer[BUFFER_SIZE];
+    
+    // Accept new connections in the handler
+    while ((client_fd = accept(server_fd, NULL, NULL)) >= 0) {
+        // Read data from the client
+        ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer) - 1);
+        if (bytes_read > 0) {
+            buffer[bytes_read] = '\0'; // Null-terminate the string
+            printf("Received: %s\n", buffer);
+            // Echo back the message
+            write(client_fd, buffer, bytes_read);
+        }
+        close(client_fd);
+    }
+}
+
+int main() {
+    int opt = 1;
+    struct sockaddr_in address;
+
+    // 创建 socket
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // 设置 socket 选项
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
+
+    // 设置地址
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
+
+    // 绑定 socket
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // 监听连接
+    if (listen(server_fd, 3) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // 关键就是下面三行代码
+    // -------
+    // 设置为异步模式
+    fcntl(server_fd, F_SETFL, O_ASYNC);
+    fcntl(server_fd, F_SETOWN, getpid());
+    // 注册信号处理程序
+    signal(SIGIO, sigio_handler);
+    // -------
+
+    printf("Server is listening on port %d...\n", PORT);
+
+    // 主循环，等待信号
+    while (1) {
+        pause(); // 等待 SIGIO 信号
+    }
+
+    close(server_fd);
+    return 0;
+}
+`
+
+四 异步IO：很复杂，其实就是中断的应用层模拟，其概念详见《node-js--study》。
