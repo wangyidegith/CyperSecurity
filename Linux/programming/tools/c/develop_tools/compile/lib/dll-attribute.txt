@@ -1,0 +1,42 @@
+零 dll允许程序员定义某个函数、类、变量的可见性。
+0 
+class MyClass {
+public:
+    void myFunction() __attribute__((visibility("default")));
+};
+
+1 
+class __attribute__((visibility("default"))) MyClass {
+public:
+    void myFunction() {
+        // Implementation
+    }
+};
+
+
+
+
+
+
+
+一 语法组成（对应Windows的__declspec(dllimport | dllexport)）
+（零）__attribute__：
+这是 GCC 和 Clang 的一个特性，用于为变量、函数或类型添加额外的属性或特征。
+
+
+
+（一）((visibility("default"))：
+0 这是一个属性参数，指定该符号的可见性级别。
+
+1 "default" 表示符号是可见的，可以被其他共享库或可执行文件引用。
+
+2 可见性级别
+除了 "default"，可见性还有其他几种级别：
+（0）default：
+符号是可见的，可以被其他模块访问。
+（1）hidden：
+符号是不可见的，默认情况下，所有未标记的符号都是可见的。使用 hidden 可以限制符号的可见性，防止其他模块访问。
+（2）internal：
+符号仅在定义它的共享库中可见，其他模块无法引用。
+（3）protected：
+符号在该库内可见，并且在子类中可见，但不允许其他模块直接引用。

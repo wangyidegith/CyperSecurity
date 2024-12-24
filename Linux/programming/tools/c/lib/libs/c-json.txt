@@ -1,0 +1,238 @@
+零 常见库
+sudo apt-get install libcjson-dev   // 轻量
+
+sudo apt-get install libjson-c-dev   // 拒绝使用
+
+sudo apt-get install libjansson-dev   // 丰富但重
+
+# 本文档介绍jansson
+
+
+
+
+
+
+
+一 字符串转对象：json_t *json_loads(const char *input, size_t flags, json_error_t *error);
+（零）返回值
+0 成功返回一个json_t对象，用户无需关注json_t的成员，其是一个句柄；
+
+1 失败返回NULL；
+
+（一）参数
+0 input：json。
+
+1 flags：选项（通常为0）.
+
+2 error：用于接收错误信息的json_error_t结构。
+（0）line: 发生错误的行号（如果适用）。
+（1）column: 发生错误的列号（如果适用）。
+（2）text: 错误信息的描述，通常是一个字符串，指示错误的性质。
+
+
+
+
+
+
+
+二 查看元素
+（零）获取对象：json_t *json_object_get(const json_t *json, const char *key);
+
+
+
+（一）判断是什么类型
+0 int json_is_string(const json_t *json);
+
+1 int json_is_integer(const json_t *json);
+
+2 int json_is_real(const json_t *json);
+
+3 int json_is_null(const json_t *json);
+
+4 int json_is_array(const json_t *json);
+
+
+
+（二）拿到元素
+0 const char *json_string_value(const json_t *json);
+
+1 json_int_t json_integer_value(const json_t *integer);
+返回值：%lld
+
+2 double json_real_value(const json_t *json);
+
+3 #define json_array_foreach(array, index, value) \
+    for (size_t index = 0; index < json_array_size(array) && \
+         (value = json_array_get(array, index)); index++)
+
+4 json_t *json_array_get(const json_t *json, size_t index);
+
+
+
+
+
+
+
+三 创建对象：json_t* json_object();
+
+
+
+
+
+
+
+四 添加元素：void json_object_set_new(json_t *json, const char *key, json_t *value);
+// 添加string、、null
+    json_object_set_new(json_object, "name", json_string("Alice"));
+
+// 添加num
+    json_object_set_new(json_object, "age", json_integer(30));
+    json_object_set_new(json_object, "tall", json_real(172.98));
+
+// 添加null
+    json_object_set_new(json_object, "girlfriend", json_null());
+
+// 添加bool
+    json_object_set_new(json_object, "is_student", json_boolean(1)); // true
+
+// 创建一个 JSON 数组并添加到对象中
+    json_t *score_array = json_array();
+    json_array_append_new(score_array, json_integer(22));
+    json_array_append_new(score_array, json_integer(1));
+    json_array_append_new(score_array, json_integer(103));
+    json_object_set_new(json_object, "score", score_array);
+
+// 创建并添加一个 JSON 对象
+    json_t *address = json_object();
+    json_object_set_new(address, "city", json_string("Wonderland"));
+    json_object_set_new(address, "zip", json_integer(12345));
+    json_object_set_new(json_object, "address", address);
+
+
+
+
+
+
+
+五 删除对象：void json_object_del(json_t *json, const char *key);
+
+
+
+
+
+
+
+六 修改对象
+（零）修改数组对象：json_array_set(json_arr, 2, json_string("Modified")); // 修改索引为 2 的元素
+
+
+（一）int json_object_set(json_t *object, const char *key, json_t *value);     // 这里涉及一种重要的内存管理技术——引用计数，详见下面。
+
+
+七 对象转字符串：char *json_dumps(const json_t *json, size_t flags)
+（零）返回值：需要用户free。
+
+
+
+（一）参数flags：控制 JSON 字符串的输出格式
+0 JSON_INDENT(n):
+说明: 设置输出的缩进级别为 n 个空格。用于格式化输出。
+示例: JSON_INDENT(4) 会使用 4 个空格进行缩进。
+
+1 JSON_COMPACT:
+说明: 生成紧凑的 JSON 字符串，不添加额外的空格和换行。
+示例: 适用于需要最小化 JSON 字符串大小的情况。
+
+2 JSON_ENCODE_ANY:
+说明: 对字符串中的任何非 ASCII 字符进行编码，包括控制字符。
+示例: 使生成的 JSON 字符串更具可移植性。
+
+3 JSON_PRESERVE_ORDER:
+说明: 保留 JSON 对象的键值对插入顺序（仅在支持的情况下）。
+示例: 在使用哈希表实现时，确保键的顺序与插入顺序一致。
+
+
+
+
+
+
+
+八 JSON数组操作（不是寻常数组，元素可以是不同类型）
+`
+#include <jansson.h>
+#include <stdio.h>
+
+int main() {
+    // 创建一个 JSON 数组
+    json_t *json_arr = json_array(); // 使用不同的变量名
+    if (!json_arr) {
+        fprintf(stderr, "Failed to create JSON array\n");
+        return 1;
+    }
+
+    // 添加不同类型的元素，json_array_append——自管理
+    json_array_append_new(json_arr, json_string("Hello")); // 字符串
+    json_array_append_new(json_arr, json_integer(42));     // 整数
+    json_array_append_new(json_arr, json_real(3.14));      // 浮点数
+    json_array_append_new(json_arr, json_true());           // 布尔值
+    json_array_append_new(json_arr, json_null());           // null
+
+    // 打印初始 JSON 数组
+    char *json_str = json_dumps(json_arr, JSON_INDENT(4));
+    printf("Initial JSON Array:\n%s\n", json_str);
+    free(json_str);
+
+    // 在索引 1 处插入新元素
+    json_array_insert_new(json_arr, 1, json_string("Inserted")); // 在索引 1 处插入字符串
+
+    // 打印修改后的 JSON 数组
+    json_str = json_dumps(json_arr, JSON_INDENT(4));
+    printf("After insertion JSON Array:\n%s\n", json_str);
+    free(json_str);
+
+    // 删除元素
+    json_array_remove(json_arr, 3); // 删除索引为 3 的元素 (布尔值)
+    json_str = json_dumps(json_arr, JSON_INDENT(4));
+    printf("After removal JSON Array:\n%s\n", json_str);
+    free(json_str);
+
+    // 查询元素
+    json_t *value = json_array_get(json_arr, 1); // 获取索引为 1 的元素
+    if (json_is_integer(value)) {
+        printf("Element at index 1: %lld\n", json_integer_value(value));
+    }
+
+    // 修改元素
+    json_array_set(json_arr, 2, json_string("Modified")); // 修改索引为 2 的元素
+    json_str = json_dumps(json_arr, JSON_INDENT(4));
+    printf("Modified JSON Array:\n%s\n", json_str);
+    free(json_str);
+
+    // 释放内存
+    json_decref(json_arr);
+
+    return 0;
+}
+`
+
+
+
+
+
+
+
+九 引用计数
+（零）概念：这是一种内存管理技术，使用一个结构或类管理某片内存的申请、指向数量增减和释放，其核心成员为一个引用计数器，当申请时引用计数器为1，某个指针指向该内存时加1，通过减一说明某个指针不再指向该内存，当减到0时，free。
+
+
+
+（一）jansson使用了引用计数的机制来管理json_t对象，涉及到的函数有json_decref(jsonobj)和json_incref(jsonobj)、json_object_set和json_object_set_new、json_object_append和json_object_append_new。
+
+
+
+（二）我们只介绍json_object_set和json_object_set_new，json数组的append同理
+0 二者功能一样都会添加元素，如有原值则替换原值。
+
+1 json_object_set_new转移原json对象的引用计数管理权即会给你自动+1你就别管了，如有原值，则-1原值的引用计数，总之就是自动管理。
+
+2 json_object_set你调用json_decref(jsonobj)和json_incref(jsonobj)手动管理。
