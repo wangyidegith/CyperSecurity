@@ -1,4 +1,4 @@
-s代表字符串；
+注：s代表字符串；
 
 替换该句中找到的第一个int为float：s/int/float
 

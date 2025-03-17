@@ -1,6 +1,0 @@
-观察静态动态库的编译方法，发现一样，那么如何区分：
-1 动态库可以不使用-L，但静态库必须使用，因而你看不使用-L的，可以肯定是动态，如果都使用了-L那就看不出来了。
-
-2 有些库既提供了动态又提供了静态，比如openssl，那么有：
-静态链接：gcc example.c -o example -static -lssl -lcrypto
-动态链接：gcc example.c -o example -lssl -lcrypto

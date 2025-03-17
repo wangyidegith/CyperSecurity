@@ -1,7 +1,7 @@
 ssh: connect to host 139.180.132.144 port 1394: Connection timed out
 像以上这种问题就是防火墙没allow1394端口造成的。
 
-ufw：uncpmplicated firewall（简易版iptables）
+ufw：uncomplicated firewall（简易版iptables）
 1 安装
 apt install ufw
 2 启用
